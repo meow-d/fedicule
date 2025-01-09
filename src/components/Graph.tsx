@@ -60,7 +60,7 @@ let communities: community[] = [];
 
 function updateGraph() {
   data = dataStore.processedData;
-  if (!data) throw new Error("No processed data");
+  if (!data) return;
 
   graph = new MultiDirectedGraph();
 
@@ -264,7 +264,6 @@ function updateRenderer() {
             parallelMaxIndex?: null;
           }
     ) => {
-      console.log(parallelIndex, parallelMinIndex, parallelMaxIndex);
       if (typeof parallelMinIndex === "number") {
         graph.mergeEdgeAttributes(edge, {
           type: parallelIndex ? "curved" : "straight",

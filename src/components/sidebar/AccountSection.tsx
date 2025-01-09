@@ -80,7 +80,6 @@ export default function AccountSection() {
       setMessage("");
     }
   });
-  setAuth({ handle: "@meow_d@mastodon.social" });
 
   return (
     <Section title="Account" open={true}>
