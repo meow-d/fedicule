@@ -1,0 +1,226 @@
+::selection {
+  /* TODO change this */
+  background-color: rgb(255, 103, 164);
+  color: #330022;
+}
+
+aside {
+  width: 18em;
+
+  display: flex;
+  flex-direction: column;
+
+  color: #b860aa;
+  background: linear-gradient(
+    90deg,
+    rgba(101, 0, 121, 1) 57%,
+    rgba(87, 0, 104, 1) 100%
+  );
+  box-shadow: 1px 0 10px #0000005f;
+  text-shadow: 1px 2px 10px #0000004b;
+}
+
+/* TODO */
+#collapseButton {
+  display: none;
+}
+
+/* header */
+.header {
+  font-family: "Bagel Fat One", serif;
+  font-size: 2em;
+  text-shadow: none;
+  filter: drop-shadow(1px 2px 10px #00000070);
+  color: rgb(255, 103, 164);
+
+  height: 2em;
+  display: flex;
+  align-items: center;
+  padding: 0.5em 0.75em;
+  gap: 0.25em;
+
+  > h1 {
+    margin: 0;
+    line-height: 0;
+    margin-bottom: 3px;
+  }
+
+  > .logo {
+    height: 70%;
+  }
+}
+
+h1,
+h2 {
+  margin: 0;
+  font-weight: unset;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-gutter: stable both-edges;
+  padding: 1.3em;
+  /* TODO style scrollbar */
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.3em;
+}
+
+/* TODO: put in Section.module.css */
+/* sections */
+section > details {
+  flex-direction: column;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+  }
+
+  > summary {
+    cursor: pointer;
+    vertical-align: middle;
+    margin-bottom: 0.5em;
+
+    * {
+      display: inline;
+    }
+
+    h2 {
+      font-size: 1.5em;
+      font-weight: 600;
+    }
+  }
+
+  h2,
+  label {
+    margin-left: 0.1rem;
+  }
+
+  label {
+    font-size: 1.1em;
+  }
+}
+
+/* inputs */
+input,
+select,
+button {
+  border: none;
+  font-size: 0.9em;
+  font-family: "DynaPuff", sans-serif;
+  font-weight: 450;
+}
+
+input:focus,
+select:focus,
+button:focus {
+  outline: none;
+}
+
+/* input and select */
+input,
+select {
+  padding: 0.6em 1em;
+  margin-bottom: 0.5em;
+  border-radius: 12px;
+  background-color: #3a003d;
+  color: #bababa;
+  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.3);
+  transition: all linear 0.3s;
+  appearance: textfield;
+}
+
+input:enabled:hover,
+select:enabled:hover {
+  border-radius: 5px;
+  background-color: #4a0050;
+}
+
+input:focus,
+select:focus {
+  border-radius: 5px;
+  background-color: #580062;
+}
+
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #ffffff30;
+}
+
+input:disabled,
+select:disabled {
+  background-color: #4a0050;
+  color: #969696;
+}
+
+/* range */
+/* unfortunately i have to do them seperately :( */
+input[type="range"] {
+  appearance: none;
+}
+
+input[type="range"]::-ms-track {
+  box-shadow: none;
+  border: none;
+  height: 1.3em;
+  width: 1.3em;
+  border-radius: 0.5em;
+  background: #a9a9a9;
+  cursor: grab;
+  transition: all linear 0.3s;
+}
+
+input[type="range"]::-ms-track:hover {
+  background: #d6d6d6;
+}
+
+input[type="range"]::-ms-track:active {
+  box-shadow: 0px 3px 10px #000000;
+  background: #d6d6d6;
+  cursor: grabbing;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  box-shadow: none;
+  border: none;
+  height: 1.3em;
+  width: 1.3em;
+  border-radius: 0.5em;
+  background: #a9a9a9;
+  cursor: grab;
+  transition: all linear 0.3s;
+}
+
+input[type="range"]::-moz-range-thumb:-webkit-slider-thumb {
+  background: #d6d6d6;
+}
+
+input[type="range"]::-moz-range-thumb:active {
+  -webkit-slider-thumb: 0px 3px 10px #000000;
+  background: #d6d6d6;
+  cursor: grabbing;
+}
+
+input[type="range"]::-moz-range-thumb {
+  box-shadow: none;
+  border: none;
+  height: 1.3em;
+  width: 1.3em;
+  border-radius: 0.5em;
+  background: #a9a9a9;
+  cursor: grab;
+  transition: all linear 0.3s;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  background: #d6d6d6;
+}
+
+input[type="range"]::-moz-range-thumb:active {
+  box-shadow: 0px 3px 10px #000000;
+  background: #d6d6d6;
+  cursor: grabbing;
+}

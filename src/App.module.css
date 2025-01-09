@@ -1,0 +1,28 @@
+.App {
+  margin: none;
+  padding: none;
+  height: 100vh;
+  width: 100vw;
+  background: #f0f0f0;
+
+  font-family: "Ubuntu", serif;
+  font-weight: 550;
+  letter-spacing: -0.05rem;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: clip;
+  height: 100%;
+  width: 100%;
+}
+
+.container > * {
+  height: 100%;
+}
+
+main {
+  flex-grow: 1;
+}

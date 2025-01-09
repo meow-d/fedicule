@@ -1,0 +1,8 @@
+.message {
+  margin: 0;
+  margin-top: 0.5em;
+}
+
+.error {
+  color: rgb(218, 70, 70);
+}

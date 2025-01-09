@@ -1,0 +1,62 @@
+.button {
+  --button-background: linear-gradient(
+    to bottom,
+    rgb(233, 104, 155) 1%,
+    rgb(146, 67, 99) 100%
+  );
+
+  appearance: none;
+  margin-top: 0.4em;
+  padding: 0;
+  display: flex;
+  position: relative;
+  background: rgba(0, 0, 0, 0.239);
+
+  overflow: clip;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  transition: all linear 0.1s;
+  will-change: transform;
+
+  &:active {
+    box-shadow: none;
+  }
+
+  > .buttonContent {
+    flex: 1;
+    padding: 0.6em 1em;
+    border-radius: 12px;
+
+    background: var(--button-background);
+    color: #42002f;
+
+    /* TODO: tweak */
+    transition: all linear 0.4s,
+      transform cubic-bezier(0.215, 0.61, 0.355, 1) 0.4s;
+  }
+
+  &:hover > .buttonContent {
+    filter: brightness(1.3);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active > .buttonContent {
+    transform: translateY(2px);
+    box-shadow: inset 0 -3px 10px -5px #000000,
+      inset 0 3px 10px rgba(0, 0, 0, 0.5);
+
+    filter: brightness(0.7);
+    transition: all linear 0.05s,
+      transform cubic-bezier(0.215, 0.61, 0.355, 1) 0.05s;
+  }
+
+  &:disabled > .buttonContent {
+    background: linear-gradient(to bottom, #a9a9a9 1%, #7a7a7a 100%);
+    color: #4a4a4a;
+  }
+
+  &:focus-visible {
+    outline: 1px solid #ffffff9e;
+    box-sizing: content-box;
+  }
+}
