@@ -21,7 +21,7 @@ export default function preprocess(data: RawData): ProcessedData {
     return node;
   }
 
-  const posts = [...data.posts, ...data.replies];
+  const posts = data.posts;
   const likes = data.likes;
   const boosts = data.boosts;
 

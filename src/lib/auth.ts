@@ -1,10 +1,10 @@
-import { sendPostRequest } from "./sendRequest";
+import { post, postParams } from "./sendRequest";
 import { auth, setAuth } from "../stores/authStore";
 
 async function createApp(instance: string) {
-  setAuth({ instance: instance });
+  setAuth({ instance });
 
-  const response = await sendPostRequest("/api/v1/apps", {
+  const response = await post("/api/v1/apps", {
     client_name: auth.clientName,
     redirect_uris: auth.clientUrl,
     scopes: "read",
@@ -12,7 +12,6 @@ async function createApp(instance: string) {
   const data = await response.json();
 
   setAuth({
-    instance,
     clientId: data.client_id,
     clientSecret: data.client_secret,
   });
@@ -33,7 +32,7 @@ async function redirectToInstance() {
 
 // FIXME: cors :(
 async function getToken(code: string) {
-  const response = await sendPostRequest("/oauth/token", {
+  const response = await postParams("/oauth/token", {
     grant_type: "authorization_code",
     code: code,
     scope: "read",
@@ -49,16 +48,19 @@ async function getToken(code: string) {
   });
 }
 
+// TODO: sharkey fix?
 async function revokeToken() {
-  await sendPostRequest("/oauth/revoke", {
-    token: auth.token,
-    client_id: auth.clientId,
-    client_secret: auth.clientSecret,
-  });
+  const token = auth.token;
 
   setAuth({
     token: "",
     loggedIn: false,
+  });
+
+  await postParams("/oauth/revoke", {
+    token: token,
+    client_id: auth.clientId,
+    client_secret: auth.clientSecret,
   });
 }
 

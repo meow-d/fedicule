@@ -56,7 +56,8 @@ interface community {
   color: string;
 }
 
-let communities: community[] = [];
+// let communities: community[] = [];
+const [communities, setCommunities] = createSignal<community[]>([]);
 
 function updateGraph() {
   data = dataStore.processedData;
@@ -112,7 +113,7 @@ function updateGraph() {
 
   // filter out nodes with low scores
   graph.forEachNode((node, attr) => {
-    if (attr.score <= 4) {
+    if (attr.score <= 2) {
       graph.dropNode(node);
     }
   });
@@ -138,17 +139,19 @@ function updateGraph() {
 
   const communitiesSet = new Set<string>();
   graph.forEachNode((_, attrs) => communitiesSet.add(attrs.community));
-  communities = Array.from(communitiesSet).map((community) => ({
-    id: community,
-    largestNode: "",
-    color: "",
-  }));
+  setCommunities(
+    Array.from(communitiesSet).map((community) => ({
+      id: community,
+      largestNode: "",
+      color: "",
+    }))
+  );
 
   // comunity colors
   const palette: Record<string, string> = iwanthue(communitiesSet.size).reduce(
     (iter, color, i) => ({
       ...iter,
-      [communities[i].id]: color,
+      [communities()[i].id]: color,
     }),
     {}
   );
@@ -157,20 +160,26 @@ function updateGraph() {
   );
 
   // find largest node in each community
-  communities.forEach((community) => {
+  const updatedCommunities = communities().map((community) => {
     const nodesInCommunity = graph.filterNodes(
       (node, attrs) => attrs.community === community.id
     );
+
     if (nodesInCommunity.length > 0) {
       const largestNode = nodesInCommunity.reduce((a, b) =>
         graph.getNodeAttribute(a, "size") > graph.getNodeAttribute(b, "size")
           ? a
           : b
       );
-      community.largestNode = largestNode;
-      community.color = palette[community.id];
+      return {
+        ...community,
+        largestNode,
+        color: palette[community.id],
+      };
     }
+    return community;
   });
+  setCommunities(updatedCommunities);
 }
 
 // fit community nodes in viewport

@@ -28,7 +28,7 @@ export default function Floating() {
       </Section>
 
       <Section title="Polycules" open={true} class={styles.floating}>
-        <For each={communities}>
+        <For each={communities()}>
           {(community) => (
             <Button background="#813975" style={{ width: "100%" }}>
               <div

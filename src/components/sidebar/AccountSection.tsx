@@ -40,6 +40,7 @@ export default function AccountSection() {
       setMessage("Creating app...");
       await createApp(instance);
 
+      setAuth({ handle });
       setMessage("Redirecting to your instance...");
       await redirectToInstance();
     } catch (error: any) {
@@ -49,6 +50,26 @@ export default function AccountSection() {
       setLoading(false);
     }
   };
+
+  onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+    if (!code) return;
+
+    try {
+      setLoading(false);
+      setIsError(false);
+      setMessage("Getting token from code...");
+      getToken(code);
+      window.history.replaceState(null, "hello safari user", "/");
+      setMessage("");
+    } catch (error: any) {
+      console.error(error);
+      setIsError(true);
+      setMessage(error.message);
+      setLoading(false);
+    }
+  });
 
   const logout = () => {
     try {
@@ -68,22 +89,10 @@ export default function AccountSection() {
     }
   };
 
-  onMount(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
-    if (code) {
-      setLoading(false);
-      setIsError(false);
-      setMessage("Getting token from code...");
-      getToken(code);
-      window.history.replaceState(null, "hello safari user", "/");
-      setMessage("");
-    }
-  });
-
   return (
     <Section title="Account" open={true}>
       <div>
+        {/* TODO we don't need handle, just instance name */}
         <label for="handle">Handle </label>
         <input
           type="text"

@@ -1,4 +1,4 @@
-import { sendGetRequest } from "./sendRequest";
+import { get } from "./sendRequest";
 import { RawData } from "../stores/data";
 
 async function fetchData(numberOfPosts: number): Promise<RawData> {
@@ -28,7 +28,7 @@ async function fetchPosts(numberOfPosts: number) {
   let url: string | null = `/api/v1/timelines/home?limit=${postsPerPage}`;
 
   while (postsLeft > 0 && url) {
-    const response = await sendGetRequest(url, {});
+    const response = await get(url, {});
     if (!response.ok) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
@@ -48,9 +48,7 @@ async function fetchReplies(posts: any[]) {
   const replies: any = await Promise.all(
     posts.map(async (post) => {
       if (!post.in_reply_to_id && !post.replies_count) return [];
-      const response = await sendGetRequest(
-        `/api/v1/statuses/${post.id}/context`
-      );
+      const response = await get(`/api/v1/statuses/${post.id}/context`);
       if (!response.ok) return null;
       const data = await response.json();
       const ancestors = data.ancestors;
@@ -84,7 +82,7 @@ async function fetchInteractions(
       | null = `/api/v1/statuses/${post.id}/${interactionType}?limit=80`;
 
     while (url) {
-      const response = await sendGetRequest(url, {});
+      const response = await get(url, {});
       const data = await response.json();
       if (!response.ok) break;
       for (const interaction of data) {
@@ -103,7 +101,7 @@ async function fetchInteractions(
 }
 
 async function fetchUser(userId: string): Promise<any> {
-  const response = await sendGetRequest(`/api/v1/accounts/${userId}`, {});
+  const response = await get(`/api/v1/accounts/${userId}`, {});
   return await response.json();
 }
 

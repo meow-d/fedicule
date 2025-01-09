@@ -49,7 +49,6 @@ export default function DataSection() {
 
   return (
     <Section title="Fetch">
-      {/* <h2>Fetch</h2> */}
       <div>
         <label for="fetch-amount">Posts to fetch</label>
         <input
@@ -62,8 +61,19 @@ export default function DataSection() {
       </div>
 
       <div>
-        <Button disabled={!auth.loggedIn || loading()} onclick={startFetch}>
+        <Button disabled={!auth.loggedIn || loading()} onClick={startFetch}>
           {data.rawData ? "refetch posts" : "fetch posts"}
+        </Button>
+        <Button
+          onClick={() => {
+            if (!data.rawData) return;
+            const processedData = preprocess(data.rawData);
+            setData({ processedData: processedData });
+            console.log("processed data", processedData);
+            update();
+          }}
+        >
+          process data
         </Button>
 
         <Show when={message()}>
