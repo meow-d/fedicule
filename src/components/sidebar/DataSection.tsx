@@ -73,7 +73,7 @@ export default function DataSection() {
             update();
           }}
         >
-          process data
+          reprocess data
         </Button>
 
         <Show when={message()}>

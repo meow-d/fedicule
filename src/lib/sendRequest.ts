@@ -37,10 +37,11 @@ async function postParams(endpoint: string, body?: Record<string, string>) {
 
 async function get(
   endpoint: string,
-  query?: Record<string, any>
+  params?: Record<string, any>
 ): Promise<any> {
-  const searchParams = new URLSearchParams(query).toString();
-  const url = `https://${auth.instance}${endpoint}?${searchParams}`;
+  let paramsString = new URLSearchParams(params).toString();
+  if (paramsString) paramsString = `?${paramsString}`;
+  const url = "https://" + auth.instance + endpoint + paramsString;
 
   const response = await fetch(url, {
     method: "GET",

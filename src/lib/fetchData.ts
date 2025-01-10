@@ -20,24 +20,34 @@ async function fetchData(numberOfPosts: number): Promise<RawData> {
   return { posts, likes, boosts };
 }
 
+// TODO
+interface Params {
+  limit: number;
+  max_id?: string | null;
+}
+
 async function fetchPosts(numberOfPosts: number) {
   const maxPosts = 40;
   let postsLeft = numberOfPosts;
   let posts: any[] = [];
-  const postsPerPage = Math.min(postsLeft, maxPosts);
-  let url: string | null = `/api/v1/timelines/home?limit=${postsPerPage}`;
+  let params: Params = {
+    limit: Math.min(postsLeft, maxPosts),
+  };
 
-  while (postsLeft > 0 && url) {
-    const response = await get(url, {});
+  while (postsLeft > 0) {
+    const response = await get("/api/v1/timelines/home", params);
+
     if (!response.ok) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
     const data = await response.json();
     posts = posts.concat(data);
 
-    url = getNextPageUrl(response.headers.link);
-
     postsLeft -= maxPosts;
+    params = {
+      limit: Math.min(postsLeft, maxPosts),
+      max_id: posts.length > 0 ? posts[posts.length - 1].id : null,
+    };
   }
 
   return posts;
@@ -77,14 +87,13 @@ async function fetchInteractions(
 
   for (const post of posts) {
     if (!post[countType]) continue;
-    let url:
-      | string
-      | null = `/api/v1/statuses/${post.id}/${interactionType}?limit=80`;
+    let url: string | null = `/api/v1/statuses/${post.id}/${interactionType}`;
 
     while (url) {
-      const response = await get(url, {});
+      const response = await get(url, { limit: 80 });
       const data = await response.json();
       if (!response.ok) break;
+
       for (const interaction of data) {
         interaction.receiver = {
           label: post.account.acct,

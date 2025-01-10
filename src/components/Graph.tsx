@@ -117,11 +117,11 @@ function updateGraph() {
       graph.dropNode(node);
     }
   });
-  graph.forEachEdge((edge, attr) => {
-    if (attr.score < 2) {
-      graph.dropEdge(edge);
-    }
-  });
+  // graph.forEachEdge((edge, attr) => {
+  //   if (attr.score < 2) {
+  //     graph.dropEdge(edge);
+  //   }
+  // });
 
   // node size based on updated edge scores
   graph.forEachNode((node, attr) => {

@@ -30,7 +30,6 @@ async function redirectToInstance() {
   window.location.href = url;
 }
 
-// FIXME: cors :(
 async function getToken(code: string) {
   const response = await postParams("/oauth/token", {
     grant_type: "authorization_code",
@@ -48,7 +47,6 @@ async function getToken(code: string) {
   });
 }
 
-// TODO: sharkey fix?
 async function revokeToken() {
   const token = auth.token;
 
@@ -57,11 +55,15 @@ async function revokeToken() {
     loggedIn: false,
   });
 
-  await postParams("/oauth/revoke", {
-    token: token,
-    client_id: auth.clientId,
-    client_secret: auth.clientSecret,
-  });
+  try {
+    await postParams("/oauth/revoke", {
+      token: token,
+      client_id: auth.clientId,
+      client_secret: auth.clientSecret,
+    });
+  } catch (error) {
+    throw new Error(">:3");
+  }
 }
 
 export { createApp, redirectToInstance, getToken, revokeToken };

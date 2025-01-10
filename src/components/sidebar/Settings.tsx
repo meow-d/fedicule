@@ -34,7 +34,7 @@ export default function Controls() {
       </div>
 
       <div>
-        <label for="filter">Filter (wip)</label>
+        <label for="filter">Filter users (wip)</label>
         <select name="filter" id="filter" onChange={changeFilter}>
           <option value={UserFilter.None}>None</option>
           <option value={UserFilter.FollowersOnly}>Followers only</option>
