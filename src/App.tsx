@@ -2,7 +2,7 @@ import type { Component } from "solid-js";
 
 import styles from "./App.module.css";
 import Sidebar from "./components/sidebar/Sidebar";
-import {Graph }from "./components/Graph";
+import { Graph } from "./components/graph/Graph";
 import { data } from "./stores/data";
 import Floating from "./components/Floating";
 

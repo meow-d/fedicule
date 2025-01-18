@@ -20,7 +20,6 @@ async function fetchData(numberOfPosts: number): Promise<RawData> {
   return { posts, likes, boosts };
 }
 
-// TODO
 interface Params {
   limit: number;
   max_id?: string | null;

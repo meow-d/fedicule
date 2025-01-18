@@ -21,8 +21,8 @@ import { fitViewportToNodes } from "@sigma/utils";
 
 import iwanthue from "iwanthue";
 
-import { data as dataStore, Node, ProcessedData } from "../stores/data";
-import { settings as settingsStore } from "../stores/settings";
+import { data as dataStore, Node, ProcessedData } from "../../stores/data";
+import { settings as settingsStore } from "../../stores/settings";
 
 let data: ProcessedData | undefined;
 let graph: MultiDirectedGraph;
@@ -441,6 +441,7 @@ function updateRenderer() {
 
 function update() {
   updateGraph();
+  switchLayout(settingsStore.layout);
   updateRenderer();
 }
 

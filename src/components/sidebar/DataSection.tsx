@@ -9,7 +9,7 @@ import { data, RawData, setData } from "../../stores/data";
 
 import { fetchData } from "../../lib/fetchData";
 import preprocess from "../../lib/preprocess";
-import { update } from "../Graph";
+import { update } from "../graph/Graph";
 import Section from "./Section";
 
 export default function DataSection() {

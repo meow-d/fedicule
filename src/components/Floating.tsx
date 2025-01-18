@@ -2,7 +2,11 @@ import { For, Show } from "solid-js";
 // TODO: split css files properly
 import sidebarStyles from "./sidebar/Sidebar.module.css";
 import styles from "./Floating.module.css";
-import { communities, fitViewportToCommunity, selectedNodes } from "./Graph";
+import {
+  communities,
+  fitViewportToCommunity,
+  selectedNodes,
+} from "./graph/Graph";
 import Button from "./sidebar/Button";
 import Section from "./sidebar/Section";
 
