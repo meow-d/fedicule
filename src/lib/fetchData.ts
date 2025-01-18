@@ -1,5 +1,5 @@
 import { get } from "./sendRequest";
-import { RawData } from "../stores/data";
+import { RawData, Account, Post, Interaction } from "../stores/data";
 
 async function fetchData(numberOfPosts: number): Promise<RawData> {
   let posts = await fetchPosts(numberOfPosts);
@@ -25,7 +25,7 @@ interface Params {
   max_id?: string | null;
 }
 
-async function fetchPosts(numberOfPosts: number) {
+async function fetchPosts(numberOfPosts: number): Promise<Post[]> {
   const maxPosts = 40;
   let postsLeft = numberOfPosts;
   let posts: any[] = [];
@@ -52,7 +52,7 @@ async function fetchPosts(numberOfPosts: number) {
   return posts;
 }
 
-async function fetchReplies(posts: any[]) {
+async function fetchReplies(posts: Post[]): Promise<any[]> {
   // TODO: should probably standardize using map vs forEach vs for
   const replies: any = await Promise.all(
     posts.map(async (post) => {
@@ -69,19 +69,19 @@ async function fetchReplies(posts: any[]) {
   return replies;
 }
 
-async function fetchLikes(posts: any[]) {
+async function fetchLikes(posts: Post[]): Promise<Interaction[]> {
   return await fetchInteractions(posts, "favourited_by", "favourites_count");
 }
 
-async function fetchBoosts(posts: any[]) {
+async function fetchBoosts(posts: Post[]): Promise<Interaction[]> {
   return await fetchInteractions(posts, "reblogged_by", "reblogs_count");
 }
 
 async function fetchInteractions(
-  posts: any[],
+  posts: Post[],
   interactionType: string,
-  countType: string
-): Promise<any[]> {
+  countType: "favourites_count" | "reblogs_count"
+): Promise<Interaction[]> {
   let interactions: any[] = [];
 
   for (const post of posts) {
@@ -90,7 +90,7 @@ async function fetchInteractions(
 
     while (url) {
       const response = await get(url, { limit: 80 });
-      const data = await response.json();
+      const data: Interaction[] = await response.json();
       if (!response.ok) break;
 
       for (const interaction of data) {
