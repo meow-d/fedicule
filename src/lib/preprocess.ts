@@ -13,9 +13,7 @@ export default function preprocess(data: RawData): ProcessedData {
 
 function preprocessMentions(posts: any[], interactions: any[]) {
   posts.forEach((post) => {
-    if (post.mentions === undefined || post.mentions.length == 0) {
-      return;
-    }
+    if (!post.mentions) return;
 
     post.mentions.forEach((mention: { [x: string]: any }) => {
       interactions.push({
@@ -25,9 +23,7 @@ function preprocessMentions(posts: any[], interactions: any[]) {
           display_name: post.account.display_name,
           image: post.account.avatar,
         },
-        receiver: getMentionInfo(mention, (node) =>
-          console.log("updated node" + node)
-        ),
+        receiver: getMentionInfo(mention, () => {}),
         type: "mention",
       });
     });
@@ -61,6 +57,7 @@ function getMentionInfo(mention: any, callback: (node: Node) => void): Node {
     image: "",
   };
 
+  // TODO: enable eventually
   // const user = fetchUser(userId.id).then((user) => {
   //   node.display_name = user.display_name;
   //   node.image = user.avatar;
