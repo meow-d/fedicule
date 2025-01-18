@@ -4,10 +4,10 @@ import { fetchUser } from "./fetchData";
 export default function preprocess(data: RawData): ProcessedData {
   const interactions: ProcessedData["interactions"] = [];
 
-  function getMentionInfo(userId: any, callback: (node: Node) => void): Node {
+  function getMentionInfo(mention: any, callback: (node: Node) => void): Node {
     const node: Node = {
-      label: userId.acct,
-      mastoApiId: userId.id,
+      label: mention.acct,
+      mastoApiId: mention.id,
       display_name: "",
       image: "",
     };
@@ -38,7 +38,7 @@ export default function preprocess(data: RawData): ProcessedData {
           display_name: post.account.display_name,
           image: post.account.avatar,
         },
-        receiver: getMentionInfo(mention.id, (node) =>
+        receiver: getMentionInfo(mention, (node) =>
           console.log("updated node" + node)
         ),
         type: "mention",
