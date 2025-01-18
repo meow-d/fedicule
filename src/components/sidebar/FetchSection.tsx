@@ -12,7 +12,7 @@ import preprocess from "../../lib/preprocess";
 import { update } from "../graph/Graph";
 import Section from "./Section";
 
-export default function DataSection() {
+export default function FetchSection() {
   const [message, setMessage] = createSignal("");
   const [isError, setIsError] = createSignal(false);
 

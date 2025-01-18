@@ -2,7 +2,7 @@ import logo from "../../assets/logo.svg";
 import styles from "./Sidebar.module.css";
 
 import AccountSection from "./AccountSection";
-import DataSection from "./DataSection";
+import FetchSection from "./FetchSection";
 import Controls from "./Settings";
 
 export default function Sidebar() {
@@ -17,7 +17,7 @@ export default function Sidebar() {
 
       <div class={styles.content}>
         <AccountSection />
-        <DataSection />
+        <FetchSection />
         <Controls />
       </div>
       <button id={styles.collapseButton}>aaa</button>
