@@ -2,7 +2,7 @@ import { settings, setSettings, UserFilter } from "../../stores/settings";
 import Button from "./Button";
 import Section from "./Section";
 
-export default function Controls() {
+export default function SettingsSection() {
   function changeFilter(e: Event) {
     if (!(e.target instanceof HTMLSelectElement)) return;
     setSettings({ userFilter: e.target.value as unknown as UserFilter });

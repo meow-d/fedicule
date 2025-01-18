@@ -3,7 +3,7 @@ import styles from "./Sidebar.module.css";
 
 import AccountSection from "./AccountSection";
 import FetchSection from "./FetchSection";
-import Controls from "./Settings";
+import SettingsSection from "./SettingsSection";
 
 export default function Sidebar() {
   let collapsed = false;
@@ -18,7 +18,7 @@ export default function Sidebar() {
       <div class={styles.content}>
         <AccountSection />
         <FetchSection />
-        <Controls />
+        <SettingsSection />
       </div>
       <button id={styles.collapseButton}>aaa</button>
     </aside>
