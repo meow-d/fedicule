@@ -2,29 +2,16 @@ import { RawData, Node, ProcessedData } from "../stores/data";
 import { fetchUser } from "./fetchData";
 
 export default function preprocess(data: RawData): ProcessedData {
-  const interactions: ProcessedData["interactions"] = [];
+  const interactions: ProcessedData["interaction"] = [];
 
-  function getMentionInfo(mention: any, callback: (node: Node) => void): Node {
-    const node: Node = {
-      label: mention.acct,
-      mastoApiId: mention.id,
-      display_name: "",
-      image: "",
-    };
+  preprocessMentions(data.posts, interactions);
+  preprocessInteractions(data.likes, "like", interactions);
+  preprocessInteractions(data.boosts, "boost", interactions);
 
-    // const user = fetchUser(userId.id).then((user) => {
-    //   node.display_name = user.display_name;
-    //   node.image = user.avatar;
-    //   callback(node);
-    // });
+  return { interaction: interactions };
+}
 
-    return node;
-  }
-
-  const posts = data.posts;
-  const likes = data.likes;
-  const boosts = data.boosts;
-
+function preprocessMentions(posts: any[], interactions: any[]) {
   posts.forEach((post) => {
     if (post.mentions === undefined || post.mentions.length == 0) {
       return;
@@ -45,32 +32,40 @@ export default function preprocess(data: RawData): ProcessedData {
       });
     });
   });
+}
 
-  likes.forEach((like) => {
+function preprocessInteractions(
+  raw: any[],
+  interactionType: string,
+  interactions: any[]
+) {
+  raw.forEach((interaction) => {
     interactions.push({
       sender: {
-        label: like.acct,
-        mastoApiId: like.id,
-        display_name: like.display_name,
-        image: like.avatar,
+        label: interaction.acct,
+        mastoApiId: interaction.id,
+        display_name: interaction.display_name,
+        image: interaction.avatar,
       },
-      receiver: like.receiver,
-      type: "like",
+      receiver: interaction.receiver,
+      type: interactionType,
     });
   });
+}
 
-  boosts.forEach((boost) => {
-    interactions.push({
-      sender: {
-        label: boost.acct,
-        mastoApiId: boost.id,
-        display_name: boost.display_name,
-        image: boost.avatar,
-      },
-      receiver: boost.receiver,
-      type: "boost",
-    });
-  });
+function getMentionInfo(mention: any, callback: (node: Node) => void): Node {
+  const node: Node = {
+    label: mention.acct,
+    mastoApiId: mention.id,
+    display_name: "",
+    image: "",
+  };
 
-  return { interactions };
+  // const user = fetchUser(userId.id).then((user) => {
+  //   node.display_name = user.display_name;
+  //   node.image = user.avatar;
+  //   callback(node);
+  // });
+
+  return node;
 }
