@@ -7,10 +7,10 @@ async function fetchData(numberOfPosts: number): Promise<RawData> {
     throw new Error("No posts on home timeline!");
   }
 
-  posts = boostToPosts(posts);
+  posts = filterBoosts(posts);
   posts = filterUniquePosts(posts);
 
-  let replies = (await fetchReplies(posts)) || [];
+  let replies = await fetchReplies(posts);
   replies = filterUniquePosts(replies);
   posts = posts.concat(replies);
 
@@ -136,8 +136,13 @@ function filterUniquePosts(posts: any[]): any[] {
   ];
 }
 
+// unused due to the Amber Puppygirlhornypost problem™️
 function boostToPosts(posts: any[]): any[] {
   return posts.map((post) => (post.reblog ? post.reblog : post));
+}
+
+function filterBoosts(posts: any[]): any[] {
+  return posts.filter((post) => !post.reblog);
 }
 
 export { fetchData, fetchUser };
