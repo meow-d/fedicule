@@ -65,7 +65,7 @@ function updateGraph() {
 
   graph = new MultiDirectedGraph();
 
-  data.interactions.forEach(
+  data.interaction.forEach(
     (interaction: { sender: Node; receiver: Node; type: string }) => {
       updateEdge(interaction.sender, interaction.receiver, interaction.type);
     }

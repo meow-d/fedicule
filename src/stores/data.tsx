@@ -16,7 +16,7 @@ interface Node {
 }
 
 interface ProcessedData {
-  interactions: {
+  interaction: {
     sender: Node;
     receiver: Node;
     type: "mention" | "boost" | "like";
