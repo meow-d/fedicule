@@ -1,4 +1,4 @@
-import { onMount, createEffect, createSignal } from "solid-js";
+import { onMount, createEffect, createSignal, Show } from "solid-js";
 
 import { MultiDirectedGraph } from "graphology";
 import louvain from "graphology-communities-louvain";
@@ -55,8 +55,6 @@ interface community {
   largestNode: string;
   color: string;
 }
-
-// let communities: community[] = [];
 const [communities, setCommunities] = createSignal<community[]>([]);
 
 function updateGraph() {
@@ -74,12 +72,18 @@ function updateGraph() {
   function updateEdge(sender: Node, receiver: Node, type: string) {
     let score: number = 1;
     switch (type) {
-      case "mention":
-        score = 4;
       case "like":
         score = 1;
+        break;
       case "boost":
         score = 2;
+        break;
+      case "mention":
+        score = 3;
+        break;
+      case "follow":
+        score = 4;
+        break;
     }
 
     updateNode(sender, score);
@@ -87,10 +91,12 @@ function updateGraph() {
 
     graph.updateEdge(sender.label, receiver.label, (attr) => {
       const finalScore = (attr.score || 0) + score * 1;
+      // const size = score;
+      const size = Math.log(score) * 2;
       return {
         ...attr,
         score: finalScore,
-        size: finalScore,
+        size: size,
       };
     });
   }
@@ -477,8 +483,20 @@ function Graph() {
   return (
     <div
       id="sigma-container"
-      style="flex-grow: 1; width: 100%; height: 100%;"
-    ></div>
+      style={{
+        "flex-grow": 1,
+        display: "flex",
+        "justify-content": "center",
+        "align-items": "center",
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      {/* TODO: you still need to refresh */}
+      <Show when={!graph}>
+        <p>no graph data... go fetch some posts!</p>
+      </Show>
+    </div>
   );
 }
 

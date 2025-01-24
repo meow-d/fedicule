@@ -4,9 +4,11 @@ import { makePersisted } from "@solid-primitives/storage";
 // TODO
 interface Auth {
   loggedIn: boolean;
-  handle: string;
+  type?: "mastodon" | "bsky";
+  handle?: string;
   instance?: string;
   token?: string;
+
   clientId?: string;
   clientSecret?: string;
   clientName: string;
@@ -14,13 +16,9 @@ interface Auth {
 }
 
 export const [auth, setAuth] = makePersisted(
-  createStore({
-    handle: "",
-    instance: "",
+  createStore<Auth>({
     loggedIn: false,
-    token: "",
-    clientId: "",
-    clientSecret: "",
+
     clientName: "fedicule",
     clientUrl: window.location.href.split("?")[0],
   })

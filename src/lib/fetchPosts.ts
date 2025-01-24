@@ -1,7 +1,7 @@
-import { get } from "./sendRequest";
-import { RawData, Account, Post, Interaction } from "../stores/data";
+import { get, getNextPageUrl } from "./fetch";
+import { PostsRaw, Account, Post, LikesOrBoost } from "../stores/data";
 
-async function fetchData(numberOfPosts: number): Promise<RawData> {
+async function fetchPostData(numberOfPosts: number): Promise<PostsRaw> {
   let posts = await fetchPosts(numberOfPosts);
   if (!posts || posts.length === 0) {
     throw new Error("No posts on home timeline!");
@@ -69,11 +69,11 @@ async function fetchReplies(posts: Post[]): Promise<any[]> {
   return replies;
 }
 
-async function fetchLikes(posts: Post[]): Promise<Interaction[]> {
+async function fetchLikes(posts: Post[]): Promise<LikesOrBoost[]> {
   return await fetchInteractions(posts, "favourited_by", "favourites_count");
 }
 
-async function fetchBoosts(posts: Post[]): Promise<Interaction[]> {
+async function fetchBoosts(posts: Post[]): Promise<LikesOrBoost[]> {
   return await fetchInteractions(posts, "reblogged_by", "reblogs_count");
 }
 
@@ -81,7 +81,7 @@ async function fetchInteractions(
   posts: Post[],
   interactionType: string,
   countType: "favourites_count" | "reblogs_count"
-): Promise<Interaction[]> {
+): Promise<LikesOrBoost[]> {
   let interactions: any[] = [];
 
   for (const post of posts) {
@@ -90,7 +90,7 @@ async function fetchInteractions(
 
     while (url) {
       const response = await get(url, { limit: 80 });
-      const data: Interaction[] = await response.json();
+      const data: LikesOrBoost[] = await response.json();
       if (!response.ok) break;
 
       for (const interaction of data) {
@@ -113,21 +113,6 @@ async function fetchUser(userId: string): Promise<any> {
   return await response.json();
 }
 
-function getNextPageUrl(linkHeader: string | null): string | null {
-  if (!linkHeader) return null;
-
-  const links = linkHeader.split(",").map((link) => link.trim());
-
-  for (const link of links) {
-    const [urlPart, relPart] = link.split(";").map((part) => part.trim());
-    if (relPart === 'rel="next"') {
-      return urlPart.slice(1, -1);
-    }
-  }
-
-  return null;
-}
-
 function filterUniquePosts(posts: any[]): any[] {
   return [
     ...new Map(
@@ -145,4 +130,4 @@ function filterBoosts(posts: any[]): any[] {
   return posts.filter((post) => !post.reblog);
 }
 
-export { fetchData, fetchUser };
+export { fetchPostData, fetchUser };

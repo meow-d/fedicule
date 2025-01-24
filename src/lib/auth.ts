@@ -1,5 +1,6 @@
-import { post, postParams } from "./sendRequest";
+import { post, postParams } from "./fetch";
 import { auth, setAuth } from "../stores/authStore";
+import { setData } from "../stores/data";
 
 async function createApp(instance: string) {
   setAuth({ instance });
@@ -18,6 +19,10 @@ async function createApp(instance: string) {
 }
 
 async function redirectToInstance() {
+  if (!auth.clientId || !auth.clientSecret) {
+    throw new Error("Client ID or Client Secret not found");
+  }
+
   const params = {
     response_type: "code",
     client_id: auth.clientId,
@@ -31,6 +36,10 @@ async function redirectToInstance() {
 }
 
 async function getToken(code: string) {
+  if (!auth.clientId || !auth.clientSecret) {
+    throw new Error("Client ID or Client Secret not found");
+  }
+
   const response = await postParams("/oauth/token", {
     grant_type: "authorization_code",
     code: code,
@@ -48,12 +57,9 @@ async function getToken(code: string) {
 }
 
 async function revokeToken() {
-  const token = auth.token;
+  if (!auth.token || !auth.clientId || !auth.clientSecret) return;
 
-  setAuth({
-    token: "",
-    loggedIn: false,
-  });
+  const token = auth.token;
 
   try {
     await postParams("/oauth/revoke", {
@@ -61,9 +67,16 @@ async function revokeToken() {
       client_id: auth.clientId,
       client_secret: auth.clientSecret,
     });
-  } catch (error) {
-    throw new Error(">:3");
-  }
+  } catch (error) {}
+
+  setAuth({
+    loggedIn: false,
+    token: undefined,
+    clientId: undefined,
+    clientSecret: undefined,
+  });
+
+  setData({ mastoAccount: undefined });
 }
 
 export { createApp, redirectToInstance, getToken, revokeToken };

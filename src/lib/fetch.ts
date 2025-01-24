@@ -37,10 +37,18 @@ async function postParams(endpoint: string, body?: Record<string, string>) {
 
 async function get(
   endpoint: string,
-  params?: Record<string, any>
+  params?: Record<string, any> | string
 ): Promise<any> {
-  let paramsString = new URLSearchParams(params).toString();
-  if (paramsString) paramsString = `?${paramsString}`;
+  let paramsString;
+  if (!params) {
+    paramsString = "";
+  } else if (typeof params === "string") {
+    paramsString = `?${params}`;
+  } else {
+    paramsString = new URLSearchParams(params).toString();
+    paramsString = `?${paramsString}`;
+  }
+
   const url = "https://" + auth.instance + endpoint + paramsString;
 
   const response = await fetch(url, {
@@ -53,4 +61,19 @@ async function get(
   return response;
 }
 
-export { post, postParams, get };
+function getNextPageUrl(linkHeader: string | null): string | null {
+  if (!linkHeader) return null;
+
+  const links = linkHeader.split(",").map((link) => link.trim());
+
+  for (const link of links) {
+    const [urlPart, relPart] = link.split(";").map((part) => part.trim());
+    if (relPart === 'rel="next"') {
+      return urlPart.slice(1, -1);
+    }
+  }
+
+  return null;
+}
+
+export { post, postParams, get, getNextPageUrl };

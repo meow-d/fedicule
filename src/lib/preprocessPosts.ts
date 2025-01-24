@@ -1,17 +1,17 @@
-import { RawData, Node, ProcessedData } from "../stores/data";
-import { fetchUser } from "./fetchData";
+import { Interaction, PostsRaw, Node, ProcessedData } from "../stores/data";
+import { fetchUser } from "./fetchPosts";
 
-export default function preprocess(data: RawData): ProcessedData {
-  const interactions: ProcessedData["interaction"] = [];
+export default function preprocessPosts(data: PostsRaw): ProcessedData {
+  const interactions: Interaction[] = [];
 
   preprocessMentions(data.posts, interactions);
-  preprocessInteractions(data.likes, "like", interactions);
-  preprocessInteractions(data.boosts, "boost", interactions);
+  preprocessLikesOrBoost(data.likes, "like", interactions);
+  preprocessLikesOrBoost(data.boosts, "boost", interactions);
 
   return { interaction: interactions };
 }
 
-function preprocessMentions(posts: any[], interactions: any[]) {
+function preprocessMentions(posts: any[], interactions: Interaction[]) {
   posts.forEach((post) => {
     if (!post.mentions) return;
 
@@ -30,10 +30,10 @@ function preprocessMentions(posts: any[], interactions: any[]) {
   });
 }
 
-function preprocessInteractions(
+function preprocessLikesOrBoost(
   raw: any[],
-  interactionType: string,
-  interactions: any[]
+  interactionType: "boost" | "like",
+  interactions: Interaction[]
 ) {
   raw.forEach((interaction) => {
     interactions.push({

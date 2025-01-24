@@ -2,6 +2,7 @@ import { createStore } from "solid-js/store";
 import { makePersisted } from "@solid-primitives/storage";
 import { MultiDirectedGraph } from "graphology";
 
+// MastoApi types
 interface Account {
   id: string;
   acct: string;
@@ -9,8 +10,9 @@ interface Account {
   avatar: string;
 }
 
-interface Interaction extends Account {
-  receiver?: Node;
+interface FamiliarFollower {
+  id: string;
+  accounts: Account[];
 }
 
 interface Post {
@@ -26,12 +28,26 @@ interface Post {
   reblog?: Post;
 }
 
-interface RawData {
+// Follows
+interface FollowRaw {
+  following: Account[];
+  followers: Account[];
+  familiarFollowers: FamiliarFollower[];
+}
+
+// Posts
+// TODO: is ths really the best name i can come up with?
+interface LikesOrBoost extends Account {
+  receiver?: Node;
+}
+
+interface PostsRaw {
   posts: Post[];
   likes: any[];
   boosts: any[];
 }
 
+// Processed
 interface Node {
   label: string;
   mastoApiId: string;
@@ -39,26 +55,33 @@ interface Node {
   image: string;
 }
 
+interface Interaction {
+  sender: Node;
+  receiver: Node;
+  type: "mention" | "boost" | "like" | "follow";
+}
+
 interface ProcessedData {
-  interaction: {
-    sender: Node;
-    receiver: Node;
-    type: "mention" | "boost" | "like";
-  }[];
+  interaction: Interaction[];
 }
 
 interface DataStore {
-  rawData?: RawData;
+  postsRaw?: PostsRaw;
   processedData?: ProcessedData;
-  graph?: MultiDirectedGraph;
+  followRaw?: FollowRaw;
+  mastoAccount?: Account;
 }
 
-export const [data, setData] = makePersisted(
-  createStore<DataStore>({
-    rawData: undefined,
-    processedData: undefined,
-    graph: undefined,
-  })
-);
+export const [data, setData] = makePersisted(createStore<DataStore>());
 
-export type { Account, Interaction, Post, RawData, Node, ProcessedData };
+export type {
+  Account,
+  FamiliarFollower,
+  Post,
+  FollowRaw,
+  LikesOrBoost,
+  PostsRaw,
+  Node,
+  Interaction,
+  ProcessedData,
+};
