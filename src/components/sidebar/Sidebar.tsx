@@ -1,7 +1,7 @@
 import logo from "../../assets/logo.svg";
 import styles from "./Sidebar.module.css";
 
-import AccountSection from "./AccountSection";
+import DataSection from "./DataSection";
 import FetchSection from "./FetchSection";
 import SettingsSection from "./SettingsSection";
 
@@ -16,8 +16,9 @@ export default function Sidebar() {
       </header>
 
       <div class={styles.content}>
-        <AccountSection />
-        <FetchSection />
+        <DataSection />
+        {/* TODO: delete */}
+        {/* <FetchSection /> */}
         <SettingsSection />
       </div>
       <button id={styles.collapseButton}>aaa</button>

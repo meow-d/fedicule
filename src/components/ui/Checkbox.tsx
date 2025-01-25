@@ -1,4 +1,5 @@
 import { JSX } from "solid-js/jsx-runtime";
+import style from "./Checkbox.module.css";
 
 interface CheckboxProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -17,7 +18,7 @@ export default function Checkbox(props: CheckboxProps) {
         onChange={props.onChange}
         ref={props.ref}
       />
-      <label for={props.name}>
+      <label for={props.name} class={style.label}>
         {props.displayName ? props.displayName : props.name}
       </label>
     </div>

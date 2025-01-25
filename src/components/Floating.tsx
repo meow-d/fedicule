@@ -10,7 +10,6 @@ import {
 import Button from "./ui/Button";
 import Section from "./ui/Section";
 
-// TODO
 export default function Floating() {
   return (
     <aside class={styles.container}>

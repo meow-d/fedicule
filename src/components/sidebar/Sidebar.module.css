@@ -60,7 +60,7 @@ h2 {
   flex: 1;
   overflow-y: auto;
   scrollbar-gutter: stable both-edges;
-  padding: 1.3em;
+  padding: 1em;
   /* TODO style scrollbar */
 
   display: flex;
@@ -71,27 +71,37 @@ h2 {
 /* TODO: put in Section.module.css */
 /* sections */
 section > details {
-  flex-direction: column;
+  padding: 10px;
+  border-radius: 15px;
+  box-shadow: 3px 0 1em #0000005a;
 
-  > div {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25em;
+  > * {
+    margin-bottom: 1rem;
   }
 
   > summary {
     cursor: pointer;
-    vertical-align: middle;
-    margin-bottom: 0.5em;
+    list-style: none;
+    margin-bottom: 0.2em;
 
-    * {
-      display: inline;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    :hover {
+      filter: brightness(1.2);
     }
 
     h2 {
       font-size: 1.5em;
       font-weight: 600;
     }
+  }
+
+  > *:not(summary) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
   }
 
   h2,
@@ -102,6 +112,19 @@ section > details {
   label {
     font-size: 1.1em;
   }
+}
+
+summary::after {
+  content: "";
+  width: 0;
+  height: 0;
+  border-top: 10px solid #b860aa;
+  border-inline: 7px solid transparent;
+  transition: transform 0.3s;
+}
+
+details[open] > summary::after {
+  transform: rotate(-180deg);
 }
 
 /* inputs */
@@ -124,7 +147,6 @@ button:focus {
 input,
 select {
   padding: 0.6em 1em;
-  margin-bottom: 0.5em;
   border-radius: 12px;
   background-color: #3a003d;
   color: #bababa;

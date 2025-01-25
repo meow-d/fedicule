@@ -1,3 +1,4 @@
+import { data } from "../../stores/data";
 import { settings, setSettings, UserFilter } from "../../stores/settings";
 import Button from "../ui/Button";
 import Section from "../ui/Section";
@@ -16,7 +17,7 @@ export default function SettingsSection() {
   }
 
   return (
-    <Section title="Settings">
+    <Section title="Settings" open={!!data.processedData}>
       <div>
         <label for="zoom">Zoom (wip)</label>
         <input
