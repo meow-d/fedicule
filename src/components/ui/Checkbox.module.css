@@ -2,3 +2,39 @@
   font-weight: 400;
   font-size: 1em;
 }
+
+.checkbox {
+  display: grid;
+  grid-template-columns: 1em auto;
+  gap: 0.5em;
+  }
+
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 1em;
+  height: 1em;
+  background-color: #3a003d;
+  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+
+  display: grid;
+  place-content: center;
+}
+
+input[type="checkbox"]::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  transform: scale(0);
+  transition: 0.05s transform ease-in-out;
+
+  transform-origin: .25em center;
+  box-shadow: inset 1em 1em 1em #bababa;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}

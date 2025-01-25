@@ -144,7 +144,9 @@ button:focus {
 }
 
 /* input and select */
-input,
+input[type="text"],
+input[type="number"],
+input[type="range"],
 select {
   padding: 0.6em 1em;
   border-radius: 12px;

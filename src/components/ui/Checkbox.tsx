@@ -9,7 +9,7 @@ interface CheckboxProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
 // TODO style checkbox
 export default function Checkbox(props: CheckboxProps) {
   return (
-    <div>
+    <div class={style.checkbox}>
       <input
         type="checkbox"
         name={props.name}
