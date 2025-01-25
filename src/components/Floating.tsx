@@ -1,12 +1,12 @@
 import { For, Show } from "solid-js";
+
+import { fitViewportToCommunity } from "./graph/Graph";
+import { communities, state } from "../stores/graph";
+
 // TODO: split css files properly
 import sidebarStyles from "./sidebar/Sidebar.module.css";
 import styles from "./Floating.module.css";
-import {
-  communities,
-  fitViewportToCommunity,
-  selectedNodes,
-} from "./graph/Graph";
+
 import Button from "./ui/Button";
 import Section from "./ui/Section";
 
@@ -14,10 +14,11 @@ export default function Floating() {
   return (
     <aside class={styles.container}>
       <Section title="Selected nodes (double click)" class={styles.floating}>
-        <Show when={selectedNodes().length === 0}>
+        <Show when={state.selectedNodes.size === 0}>
           <div>no node selected</div>
         </Show>
-        <For each={selectedNodes()}>
+
+        <For each={Array.from(state.selectedNodes.values())}>
           {(node) => (
             <div class={styles.node}>
               <img src={node.image} alt={node.label} />
