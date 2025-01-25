@@ -7,8 +7,8 @@ import {
   fitViewportToCommunity,
   selectedNodes,
 } from "./graph/Graph";
-import Button from "./sidebar/Button";
-import Section from "./sidebar/Section";
+import Button from "./ui/Button";
+import Section from "./ui/Section";
 
 // TODO
 export default function Floating() {

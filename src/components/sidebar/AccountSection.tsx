@@ -1,7 +1,7 @@
 import { createSignal, onMount, Show } from "solid-js";
 
-import Message from "./Message";
-import Button from "./Button";
+import Message from "../ui/Message";
+import Button from "../ui/Button";
 import {
   createApp,
   getToken,
@@ -10,7 +10,7 @@ import {
 } from "../../lib/auth";
 import { auth, setAuth } from "../../stores/authStore";
 import { loading, setLoading } from "../../stores/loading";
-import Section from "./Section";
+import Section from "../ui/Section";
 
 export default function AccountSection() {
   const [message, setMessage] = createSignal("");

@@ -1,7 +1,7 @@
 import { createSignal, Show } from "solid-js";
 
-import Button from "./Button";
-import Message from "./Message";
+import Button from "../ui/Button";
+import Message from "../ui/Message";
 
 import { auth } from "../../stores/authStore";
 import { loading, setLoading } from "../../stores/loading";
@@ -10,8 +10,8 @@ import { data, FollowRaw, PostsRaw, setData } from "../../stores/data";
 import { fetchPostData } from "../../lib/fetchPosts";
 import preprocessPosts from "../../lib/preprocessPosts";
 import { update } from "../graph/Graph";
-import Section from "./Section";
-import Checkbox from "./Checkbox";
+import Section from "../ui/Section";
+import Checkbox from "../ui/Checkbox";
 import { fetchFollowData } from "../../lib/fetchFollows";
 import preprocessFollows from "../../lib/preprocessFollows";
 

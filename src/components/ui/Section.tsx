@@ -1,5 +1,5 @@
 import { JSX } from "solid-js/jsx-runtime";
-import styles from "./Sidebar.module.css";
+import styles from "../sidebar/Sidebar.module.css";
 
 interface SectionProps extends JSX.HTMLAttributes<HTMLElement> {
   title: string;

@@ -1,6 +1,6 @@
 import { settings, setSettings, UserFilter } from "../../stores/settings";
-import Button from "./Button";
-import Section from "./Section";
+import Button from "../ui/Button";
+import Section from "../ui/Section";
 
 export default function SettingsSection() {
   function changeFilter(e: Event) {
