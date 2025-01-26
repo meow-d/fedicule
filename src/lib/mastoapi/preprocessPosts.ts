@@ -1,5 +1,5 @@
-import { Interaction, PostsRaw, Node, ProcessedData } from "../stores/data";
-import { fetchUser } from "./fetchPosts";
+import { Interaction, PostsRaw, Node, ProcessedData } from "../../stores/data";
+import { fetchUser } from "./fetchFeed";
 
 export default function preprocessPosts(data: PostsRaw): ProcessedData {
   const interactions: Interaction[] = [];

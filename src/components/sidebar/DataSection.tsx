@@ -2,16 +2,16 @@ import { createEffect, createSignal, onMount, Show } from "solid-js";
 
 import { update } from "../graph/Graph";
 
-import { fetchPostData } from "../../lib/fetchPosts";
+import { fetchFeed as fetchFeedData } from "../../lib/mastoapi/fetchFeed";
 import preprocessPosts from "../../lib/preprocessPosts";
-import { fetchFollowData } from "../../lib/fetchFollows";
+import { fetchFollows as fetchFollowData } from "../../lib/mastoapi/fetchFollows";
 import preprocessFollows from "../../lib/preprocessFollows";
 import {
   createApp,
   getToken,
   redirectToInstance,
   revokeToken,
-} from "../../lib/auth";
+} from "../../lib/mastoapi/auth";
 
 import Section from "../ui/Section";
 import Checkbox from "../ui/Checkbox";
@@ -98,7 +98,7 @@ export default function DataSection() {
     }
 
     setStatus("Fetching posts...");
-    const postsRaw: PostsRaw = await fetchPostData(parseInt(numberOfPosts));
+    const postsRaw: PostsRaw = await fetchFeedData(parseInt(numberOfPosts));
     setData({ postsRaw });
 
     setStatus("Preprocessing posts and fetching extra data...");

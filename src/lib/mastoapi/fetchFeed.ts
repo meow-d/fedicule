@@ -1,7 +1,7 @@
-import { get, getNextPageUrl } from "./fetch";
-import { PostsRaw, Account, Post, LikesOrBoost } from "../stores/data";
+import { get, getNextPageUrl } from "../fetch";
+import { PostsRaw, Account, Post, LikesOrBoost } from "../../stores/data";
 
-async function fetchPostData(numberOfPosts: number): Promise<PostsRaw> {
+export async function fetchFeed(numberOfPosts: number): Promise<PostsRaw> {
   let posts = await fetchPosts(numberOfPosts);
   if (!posts || posts.length === 0) {
     throw new Error("No posts on home timeline!");
@@ -108,7 +108,7 @@ async function fetchInteractions(
   return interactions;
 }
 
-async function fetchUser(userId: string): Promise<any> {
+export async function fetchUser(userId: string): Promise<any> {
   const response = await get(`/api/v1/accounts/${userId}`, {});
   return await response.json();
 }
@@ -129,5 +129,3 @@ function boostToPosts(posts: any[]): any[] {
 function filterBoosts(posts: any[]): any[] {
   return posts.filter((post) => !post.reblog);
 }
-
-export { fetchPostData, fetchUser };

@@ -1,6 +1,6 @@
-import { post, postParams } from "./fetch";
-import { auth, setAuth } from "../stores/authStore";
-import { setData } from "../stores/data";
+import { post, postParams } from "../fetch";
+import { auth, setAuth } from "../../stores/authStore";
+import { setData } from "../../stores/data";
 
 async function createApp(instance: string) {
   setAuth({ instance });

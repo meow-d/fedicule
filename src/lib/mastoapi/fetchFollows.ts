@@ -1,13 +1,13 @@
-import { get, getNextPageUrl } from "./fetch";
+import { get, getNextPageUrl } from "../fetch";
 import {
   Account,
   FamiliarFollower,
   FollowRaw,
   data,
   setData,
-} from "../stores/data";
+} from "../../stores/data";
 
-async function fetchFollowData(): Promise<FollowRaw> {
+export async function fetchFollows(): Promise<FollowRaw> {
   if (!data.mastoAccount) {
     const mastoAccount = await getAccount();
     setData({ mastoAccount });
@@ -71,5 +71,3 @@ async function getAccount(): Promise<Account> {
   const response = await get("/api/v1/accounts/verify_credentials");
   return await response.json();
 }
-
-export { fetchFollowData };
