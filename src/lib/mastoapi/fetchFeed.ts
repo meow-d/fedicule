@@ -53,8 +53,7 @@ async function fetchPosts(numberOfPosts: number): Promise<Post[]> {
 }
 
 async function fetchReplies(posts: Post[]): Promise<any[]> {
-  // TODO: should probably standardize using map vs forEach vs for
-  const replies: any = await Promise.all(
+  const replies = await Promise.all(
     posts.map(async (post) => {
       if (!post.in_reply_to_id && !post.replies_count) return [];
       const response = await get(`/api/v1/statuses/${post.id}/context`);
