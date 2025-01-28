@@ -1,7 +1,12 @@
-import { Interaction, PostsRaw, Node, ProcessedData } from "../../stores/data";
-import { fetchUser } from "./fetchFeed";
+import {
+  Interaction,
+  MastoFeedRaw,
+  Node,
+  ProcessedData,
+} from "../../stores/data";
+import { fetchUser } from "./user";
 
-export default function preprocessPosts(data: PostsRaw): ProcessedData {
+export default function preprocessPosts(data: MastoFeedRaw): ProcessedData {
   const interactions: Interaction[] = [];
 
   preprocessMentions(data.posts, interactions);
@@ -28,6 +33,24 @@ function preprocessMentions(posts: any[], interactions: Interaction[]) {
       });
     });
   });
+
+  function getMentionInfo(mention: any, callback: (node: Node) => void): Node {
+    const node: Node = {
+      label: mention.acct,
+      mastoApiId: mention.id,
+      display_name: "",
+      image: "",
+    };
+
+    // TODO: only fetch for missing info... but we need the graph to be processed first to know... fuck..
+    // const user = fetchUser(userId.id).then((user) => {
+    //   node.display_name = user.display_name;
+    //   node.image = user.avatar;
+    //   callback(node);
+    // });
+
+    return node;
+  }
 }
 
 function preprocessLikesOrBoost(
@@ -47,22 +70,4 @@ function preprocessLikesOrBoost(
       type: interactionType,
     });
   });
-}
-
-function getMentionInfo(mention: any, callback: (node: Node) => void): Node {
-  const node: Node = {
-    label: mention.acct,
-    mastoApiId: mention.id,
-    display_name: "",
-    image: "",
-  };
-
-  // TODO: enable eventually
-  // const user = fetchUser(userId.id).then((user) => {
-  //   node.display_name = user.display_name;
-  //   node.image = user.avatar;
-  //   callback(node);
-  // });
-
-  return node;
 }

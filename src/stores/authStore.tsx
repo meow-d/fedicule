@@ -2,9 +2,11 @@ import { createStore } from "solid-js/store";
 import { makePersisted } from "@solid-primitives/storage";
 
 // TODO
-interface Auth {
+export interface Auth {
   loggedIn: boolean;
   type?: "mastodon" | "bsky";
+
+  // mastoapi
   handle?: string;
   instance?: string;
   token?: string;
@@ -13,6 +15,9 @@ interface Auth {
   clientSecret?: string;
   clientName: string;
   clientUrl: string;
+
+  // bsky
+  did?: string;
 }
 
 export const [auth, setAuth] = makePersisted(

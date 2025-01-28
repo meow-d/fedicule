@@ -1,6 +1,6 @@
-import { auth } from "../stores/authStore";
+import { auth } from "../../stores/authStore";
 
-async function post(
+export async function post(
   endpoint: string,
   body?: Record<string, string>
 ): Promise<any> {
@@ -20,7 +20,10 @@ async function post(
   return response;
 }
 
-async function postParams(endpoint: string, body?: Record<string, string>) {
+export async function postParams(
+  endpoint: string,
+  body?: Record<string, string>
+) {
   const searchParams = new URLSearchParams(body).toString();
   const url = `https://${auth.instance}${endpoint}?${searchParams}`;
 
@@ -35,10 +38,12 @@ async function postParams(endpoint: string, body?: Record<string, string>) {
   return response;
 }
 
-async function get(
+export async function get(
   endpoint: string,
   params?: Record<string, any> | string
 ): Promise<any> {
+  if (!auth.token) throw new Error("No token in auth store");
+
   let paramsString;
   if (!params) {
     paramsString = "";
@@ -56,12 +61,14 @@ async function get(
     headers: { Authorization: `Bearer ${auth.token}` },
   });
 
-  // TODO: error handling
+  if (!response.ok) {
+    throw new Error(`Error: ${response.status} ${response.statusText}`);
+  }
 
   return response;
 }
 
-function getNextPageUrl(linkHeader: string | null): string | null {
+export function getNextPageUrl(linkHeader: string | null): string | null {
   if (!linkHeader) return null;
 
   const links = linkHeader.split(",").map((link) => link.trim());
@@ -75,5 +82,3 @@ function getNextPageUrl(linkHeader: string | null): string | null {
 
   return null;
 }
-
-export { post, postParams, get, getNextPageUrl };

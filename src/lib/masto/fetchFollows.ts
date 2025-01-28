@@ -1,32 +1,18 @@
-import { get, getNextPageUrl } from "../fetch";
+import { get, getNextPageUrl } from "./mastoApi";
 import {
-  Account,
-  FamiliarFollower,
-  FollowRaw,
-  data,
-  setData,
+  MastoAccount,
+  MastoFamiliarFollower,
+  MastoFollowRaw,
 } from "../../stores/data";
 
-export async function fetchFollows(): Promise<FollowRaw> {
-  if (!data.mastoAccount) {
-    const mastoAccount = await getAccount();
-    setData({ mastoAccount });
-  }
-  if (!data.mastoAccount) {
-    throw new Error("Error getting current account");
-  }
+export default async function fetchFollows(): Promise<MastoFollowRaw> {
+  const mastoAccount = await getAccount();
 
-  const following: Account[] = await fetchRelationships(
-    data.mastoAccount.id,
-    "following"
-  );
-  const followers: Account[] = await fetchRelationships(
-    data.mastoAccount.id,
-    "followers"
-  );
+  const following = await fetchRelationships(mastoAccount.id, "following");
+  const followers = await fetchRelationships(mastoAccount.id, "followers");
 
-  const allAccounts: Account[] = following.concat(followers);
-  const uniqueAccounts: Account[] = Array.from(
+  const allAccounts = following.concat(followers);
+  const uniqueAccounts = Array.from(
     new Map(allAccounts.map((item) => [item.id, item])).values()
   );
   const familiarFollowers = await fetchFamiliarFollowers(uniqueAccounts);
@@ -37,14 +23,13 @@ export async function fetchFollows(): Promise<FollowRaw> {
 async function fetchRelationships(
   id: string,
   type: "following" | "followers"
-): Promise<Account[]> {
+): Promise<MastoAccount[]> {
   let url: string | null = `/api/v1/accounts/${id}/${type}`;
-  let accounts: Account[] = [];
+  let accounts: MastoAccount[] = [];
 
   while (url) {
     const response = await get(url, { limit: 80 });
-    const data: Account[] = await response.json();
-    if (!response.ok) break;
+    const data: MastoAccount[] = await response.json();
     accounts = accounts.concat(data);
 
     url = getNextPageUrl(response.headers.link);
@@ -53,8 +38,8 @@ async function fetchRelationships(
 }
 
 async function fetchFamiliarFollowers(
-  accounts: Account[]
-): Promise<FamiliarFollower[]> {
+  accounts: MastoAccount[]
+): Promise<MastoFamiliarFollower[]> {
   const params = new URLSearchParams();
   accounts.forEach((account) => {
     params.append("id[]", account.id);
@@ -67,7 +52,7 @@ async function fetchFamiliarFollowers(
   return await response.json();
 }
 
-async function getAccount(): Promise<Account> {
+async function getAccount(): Promise<MastoAccount> {
   const response = await get("/api/v1/accounts/verify_credentials");
   return await response.json();
 }

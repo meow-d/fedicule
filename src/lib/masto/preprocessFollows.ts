@@ -1,17 +1,17 @@
 import {
-  Account,
-  FamiliarFollower,
-  FollowRaw,
+  MastoAccount,
+  MastoFamiliarFollower,
+  MastoFollowRaw,
   Interaction,
   ProcessedData,
   data,
-} from "../stores/data";
+} from "../../stores/data";
 
 export default async function preprocessFollows(
-  raw: FollowRaw
+  raw: MastoFollowRaw
 ): Promise<ProcessedData> {
   if (!data.mastoAccount) throw new Error("User mastodon account not found");
-  const userAccount: Account = data.mastoAccount;
+  const userAccount: MastoAccount = data.mastoAccount;
   const interactions: Interaction[] = [];
 
   raw.following.forEach((account) => {
@@ -28,12 +28,12 @@ export default async function preprocessFollows(
 }
 
 function preprocessFamiliarFollowers(
-  raw: FollowRaw,
+  raw: MastoFollowRaw,
   interactions: Interaction[]
 ) {
-  const familiarFollowers: FamiliarFollower[] = raw.familiarFollowers;
-  const following: Account[] = raw.following;
-  const followers: Account[] = raw.followers;
+  const familiarFollowers: MastoFamiliarFollower[] = raw.familiarFollowers;
+  const following: MastoAccount[] = raw.following;
+  const followers: MastoAccount[] = raw.followers;
 
   familiarFollowers.forEach((familiarFollower) => {
     const receiver =
@@ -52,8 +52,8 @@ function preprocessFamiliarFollowers(
 }
 
 function addFollow(
-  sender: Account,
-  receiver: Account,
+  sender: MastoAccount,
+  receiver: MastoAccount,
   interactions: Interaction[]
 ) {
   interactions.push({

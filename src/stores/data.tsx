@@ -1,87 +1,91 @@
 import { createStore } from "solid-js/store";
 import { makePersisted } from "@solid-primitives/storage";
-import { MultiDirectedGraph } from "graphology";
+import { AppBskyActorDefs } from "@atcute/client/lexicons";
 
 // MastoApi types
-interface Account {
+// TODO: ok i have no idea what to name these, should probably put into its own file
+export interface MastoAccount {
   id: string;
   acct: string;
   display_name: string;
   avatar: string;
 }
 
-interface FamiliarFollower {
+export interface MastoFamiliarFollower {
   id: string;
-  accounts: Account[];
+  accounts: MastoAccount[];
 }
 
-interface Post {
+export interface MastoPost {
   id: string;
   content: string;
   created_at: string;
   visibility: string;
-  account: Account;
+  account: MastoAccount;
   favourites_count: number;
   reblogs_count: number;
   in_reply_to_id?: string;
   replies_count?: number;
-  reblog?: Post;
+  reblog?: MastoPost;
 }
 
-// Follows
-interface FollowRaw {
-  following: Account[];
-  followers: Account[];
-  familiarFollowers: FamiliarFollower[];
-}
-
-// Posts
 // TODO: is ths really the best name i can come up with?
-interface LikesOrBoost extends Account {
+export interface MastoLikesOrBoost extends MastoAccount {
   receiver?: Node;
 }
 
-interface PostsRaw {
-  posts: Post[];
+export interface MastoFeedRaw {
+  posts: MastoPost[];
   likes: any[];
   boosts: any[];
 }
 
+export interface MastoFollowRaw {
+  following: MastoAccount[];
+  followers: MastoAccount[];
+  familiarFollowers: MastoFamiliarFollower[];
+}
+
+// Bsky types
+export interface BskyPostsRaw {}
+
+export interface BskyProfileWithFollowers extends AppBskyActorDefs.ProfileView {
+  knownFollowers?: AppBskyActorDefs.ProfileView[];
+}
+
+export interface BskyFollowRaw {
+  following: AppBskyActorDefs.ProfileView[];
+  followers: AppBskyActorDefs.ProfileView[];
+  familiarFollowers: BskyProfileWithFollowers[];
+}
+
 // Processed
-interface Node {
+export interface Node {
   label: string;
-  mastoApiId: string;
+  mastoApiId?: string;
+  bskyDid?: string;
   display_name: string;
   image: string;
 }
 
-interface Interaction {
+export interface Interaction {
   sender: Node;
   receiver: Node;
   type: "mention" | "boost" | "like" | "follow";
 }
 
-interface ProcessedData {
+export interface ProcessedData {
   interaction: Interaction[];
 }
 
-interface DataStore {
-  postsRaw?: PostsRaw;
+export interface DataStore {
+  mastoAccount?: MastoAccount;
+  mastoFeedRaw?: MastoFeedRaw;
+  mastoFollowRaw?: MastoFollowRaw;
+  bskyAccount?: AppBskyActorDefs.ProfileView;
+  // TODO bskyPostsRaw?: any;
+  bskyFollowRaw?: BskyFollowRaw;
   processedData?: ProcessedData;
-  followRaw?: FollowRaw;
-  mastoAccount?: Account;
 }
 
 export const [data, setData] = makePersisted(createStore<DataStore>());
-
-export type {
-  Account,
-  FamiliarFollower,
-  Post,
-  FollowRaw,
-  LikesOrBoost,
-  PostsRaw,
-  Node,
-  Interaction,
-  ProcessedData,
-};

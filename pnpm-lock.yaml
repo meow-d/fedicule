@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@atcute/bluesky':
+        specifier: ^1.0.12
+        version: 1.0.12(@atcute/client@2.0.7)
+      '@atcute/client':
+        specifier: ^2.0.7
+        version: 2.0.7
       '@sigma/edge-curve':
         specifier: ^3.1.0
         version: 3.1.0(sigma@3.0.0(graphology-types@0.24.8))
@@ -69,6 +75,14 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
+
+  '@atcute/bluesky@1.0.12':
+    resolution: {integrity: sha512-oUM+MxD5asGYyQDOHBGay7f9ryhsBpQ8LTUmsEZvp4t/WG0ZV2AcFRWsG0DxB+CsmSTbP2DHLMZCatE3usmt+g==}
+    peerDependencies:
+      '@atcute/client': ^1.0.0 || ^2.0.0
+
+  '@atcute/client@2.0.7':
+    resolution: {integrity: sha512-bvNahrCGvhZw/EIx0HU/GOoKZEnUaAppbuZh7cu+VsOFA2tdFLnZJed9Hagh5Yz/eUX7QUh5NB4dRTRUdggSLQ==}
 
   '@babel/code-frame@7.26.2':
     resolution: {integrity: sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ==}
@@ -831,6 +845,12 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
+
+  '@atcute/bluesky@1.0.12(@atcute/client@2.0.7)':
+    dependencies:
+      '@atcute/client': 2.0.7
+
+  '@atcute/client@2.0.7': {}
 
   '@babel/code-frame@7.26.2':
     dependencies:

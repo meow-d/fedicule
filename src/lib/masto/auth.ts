@@ -1,10 +1,7 @@
-import { post, postParams } from "../fetch";
-import { auth, setAuth } from "../../stores/authStore";
-import { setData } from "../../stores/data";
+import { post, postParams } from "./mastoApi";
+import { type Auth } from "../../stores/authStore";
 
-async function createApp(instance: string) {
-  setAuth({ instance });
-
+async function createApp(instance: string, auth: Auth): Promise<Auth> {
   const response = await post("/api/v1/apps", {
     client_name: auth.clientName,
     redirect_uris: auth.clientUrl,
@@ -12,13 +9,15 @@ async function createApp(instance: string) {
   });
   const data = await response.json();
 
-  setAuth({
+  return {
+    ...auth,
+    instance,
     clientId: data.client_id,
     clientSecret: data.client_secret,
-  });
+  };
 }
 
-async function redirectToInstance() {
+function redirectToInstance(auth: Auth) {
   if (!auth.clientId || !auth.clientSecret) {
     throw new Error("Client ID or Client Secret not found");
   }
@@ -35,7 +34,7 @@ async function redirectToInstance() {
   window.location.href = url;
 }
 
-async function getToken(code: string) {
+async function getToken(code: string, auth: Auth): Promise<Auth> {
   if (!auth.clientId || !auth.clientSecret) {
     throw new Error("Client ID or Client Secret not found");
   }
@@ -50,33 +49,31 @@ async function getToken(code: string) {
   });
   const data = await response.json();
 
-  setAuth({
+  return {
+    ...auth,
     token: data.access_token,
     loggedIn: true,
-  });
+  };
 }
 
-async function revokeToken() {
-  if (!auth.token || !auth.clientId || !auth.clientSecret) return;
+async function revokeToken(auth: Auth): Promise<Auth> {
+  if (auth.token && auth.clientId && auth.clientSecret) {
+    try {
+      await postParams("/oauth/revoke", {
+        token: auth.token,
+        client_id: auth.clientId,
+        client_secret: auth.clientSecret,
+      });
+    } catch (error) {}
+  }
 
-  const token = auth.token;
-
-  try {
-    await postParams("/oauth/revoke", {
-      token: token,
-      client_id: auth.clientId,
-      client_secret: auth.clientSecret,
-    });
-  } catch (error) {}
-
-  setAuth({
+  return {
+    ...auth,
     loggedIn: false,
     token: undefined,
     clientId: undefined,
     clientSecret: undefined,
-  });
-
-  setData({ mastoAccount: undefined });
+  };
 }
 
 export { createApp, redirectToInstance, getToken, revokeToken };

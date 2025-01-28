@@ -2,16 +2,14 @@ import { createEffect, createSignal, onMount, Show } from "solid-js";
 
 import { update } from "../graph/Graph";
 
-import { fetchFeed as fetchFeedData } from "../../lib/mastoapi/fetchFeed";
-import preprocessPosts from "../../lib/preprocessPosts";
-import { fetchFollows as fetchFollowData } from "../../lib/mastoapi/fetchFollows";
-import preprocessFollows from "../../lib/preprocessFollows";
+import { MastoClient } from "../../lib/masto/client";
+
 import {
   createApp,
   getToken,
   redirectToInstance,
   revokeToken,
-} from "../../lib/mastoapi/auth";
+} from "../../lib/masto/auth";
 
 import Section from "../ui/Section";
 import Checkbox from "../ui/Checkbox";
@@ -20,24 +18,27 @@ import Button from "../ui/Button";
 
 import { auth, setAuth } from "../../stores/authStore";
 import { loading, setLoading } from "../../stores/loading";
-import { data, FollowRaw, PostsRaw, setData } from "../../stores/data";
+import { data, MastoFollowRaw, MastoFeedRaw, setData } from "../../stores/data";
+import { Client } from "../../lib/Client";
+import { BskyClient } from "../../lib/bsky/client";
 
 export default function DataSection() {
   const [message, setMessage] = createSignal("");
   const [isError, setIsError] = createSignal(false);
   const [fetchEnabled, setFetchEnabled] = createSignal(true);
-  let homeCheckbox, followsCheckbox, fetchAmount, apiSelect;
+  let homeCheckbox, followsCheckbox, fetchAmount, apiSelect, handleInput;
 
-  const login = async () => {
+  const mastoLogin = async () => {
     try {
-      const handle = (document.getElementById("handle") as HTMLInputElement)
-        .value;
+      const handle = (handleInput as unknown as HTMLInputElement).value;
       const api = (apiSelect as unknown as HTMLSelectElement).value;
 
       if (!handle || !api) {
         throw new Error("Fields are not filled in");
       }
-
+      if (api === "bsky") {
+        throw new Error("No login required for Bluesky");
+      }
       if (auth.loggedIn) {
         throw new Error("Already logged in");
       }
@@ -50,11 +51,11 @@ export default function DataSection() {
       setLoading(true);
       setIsError(false);
       setMessage("Creating app...");
-      await createApp(instance);
+      setAuth(await createApp(instance, auth));
 
       setAuth({ handle });
       setMessage("Redirecting to your instance...");
-      await redirectToInstance();
+      redirectToInstance(auth);
     } catch (error: any) {
       console.error(error);
       setIsError(true);
@@ -63,25 +64,38 @@ export default function DataSection() {
     }
   };
 
-  // TODO: error handling
   const startFetch = async () => {
-    if (!homeCheckbox || !followsCheckbox || !fetchAmount) return;
+    if (!homeCheckbox || !followsCheckbox || !fetchAmount || !apiSelect) return;
 
     const isFollowsChecked = (followsCheckbox as HTMLInputElement).checked;
     const isHomeChecked = (homeCheckbox as HTMLInputElement).checked;
-
+    const api = (apiSelect as unknown as HTMLSelectElement).value;
+    const handle = (handleInput as unknown as HTMLInputElement).value;
+    if (!handle) {
+      throw new Error("Fields are not filled in");
+    }
     if (!isFollowsChecked && !isHomeChecked) {
       setMessage("Please select at least one source");
       setIsError(true);
       return;
     }
 
-    setData({ postsRaw: undefined, processedData: undefined });
+    setData({ processedData: undefined });
+
+    let client;
+    if (api === "mastoapi") {
+      client = new MastoClient();
+    } else if (api === "bsky") {
+      client = await BskyClient.create(handle);
+    } else {
+      throw new Error("Not implemented");
+    }
+
+    client.onProgress((update) => setMessage(update));
 
     try {
-      if (isFollowsChecked) await fetchFollows();
-      if (isHomeChecked) await fetchPosts();
-      setStatus("Success!", false, false);
+      if (isFollowsChecked) await fetchFollows(client as Client);
+      if (isHomeChecked) await fetchPosts(client as Client);
       update();
     } catch (error: any) {
       console.error(error);
@@ -89,35 +103,26 @@ export default function DataSection() {
     }
   };
 
-  const fetchPosts = async () => {
+  const fetchFollows = async (client: Client) => {
+    const processedData = await client.fetchFollows();
+    setData({ processedData });
+  };
+
+  const fetchPosts = async (client: Client) => {
     if (!fetchAmount) return;
 
-    const numberOfPosts = (fetchAmount as HTMLInputElement).value;
-    if (!numberOfPosts || isNaN(parseInt(numberOfPosts))) {
+    const postCount = (fetchAmount as HTMLInputElement).value;
+    const postCountInt = parseInt(postCount);
+    if (!postCount || isNaN(postCountInt)) {
       throw new Error("Please enter a number");
     }
 
-    setStatus("Fetching posts...");
-    const postsRaw: PostsRaw = await fetchFeedData(parseInt(numberOfPosts));
-    setData({ postsRaw });
-
-    setStatus("Preprocessing posts and fetching extra data...");
-    const processedData = preprocessPosts(postsRaw);
+    const processedData = await client.fetchFeed(postCountInt);
     if (data.processedData) {
       processedData.interaction = data.processedData.interaction.concat(
         processedData.interaction
       );
     }
-    setData({ processedData });
-  };
-
-  const fetchFollows = async () => {
-    setStatus("Fetching follows...");
-    const followRaw = await fetchFollowData();
-    setData({ followRaw });
-
-    setStatus("Preprocessing follows...");
-    const processedData = await preprocessFollows(followRaw);
     setData({ processedData });
   };
 
@@ -131,7 +136,7 @@ export default function DataSection() {
     setLoading(loading || true);
   };
 
-  onMount(() => {
+  onMount(async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
     if (!code) return;
@@ -140,8 +145,8 @@ export default function DataSection() {
       setLoading(false);
       setIsError(false);
       setMessage("Getting token from code...");
-      getToken(code);
       window.history.replaceState(null, "hello safari user", "/");
+      setAuth(await getToken(code, auth));
       setMessage("");
     } catch (error: any) {
       console.error(error);
@@ -151,13 +156,13 @@ export default function DataSection() {
     }
   });
 
-  const logout = () => {
+  const logout = async () => {
     try {
       setIsError(false);
       setLoading(true);
       setMessage("Logging out...");
 
-      revokeToken();
+      setAuth(await revokeToken(auth));
 
       setLoading(false);
       setMessage("");
@@ -202,6 +207,7 @@ export default function DataSection() {
           name="handle"
           id="handle"
           value={auth.handle ? auth.handle : ""}
+          ref={handleInput}
           disabled={loading() || auth.loggedIn}
         />
       </div>
@@ -235,7 +241,7 @@ export default function DataSection() {
 
       <div>
         <Show when={!auth.loggedIn}>
-          <Button disabled={loading()} onclick={login}>
+          <Button disabled={loading()} onclick={mastoLogin}>
             login
           </Button>
         </Show>
@@ -250,33 +256,7 @@ export default function DataSection() {
           disabled={(fetchEnabled() && !auth.loggedIn) || loading()}
           onClick={startFetch}
         >
-          {data.postsRaw ? "refetch" : "fetch"}
-        </Button>
-
-        {/* TODO: remove test code */}
-        <Button
-          onClick={async () => {
-            setData({ processedData: undefined });
-            let processedData;
-            if (data.followRaw) {
-              processedData = await preprocessFollows(data.followRaw);
-              setData({ processedData });
-            }
-            if (data.postsRaw) {
-              const processedPosts = preprocessPosts(data.postsRaw);
-              if (processedData) {
-                processedData.interaction = processedData.interaction.concat(
-                  processedPosts.interaction
-                );
-              }
-              setData({ processedData });
-            }
-            setData({ processedData });
-            console.log("processed data", processedData);
-            update();
-          }}
-        >
-          reprocess data (for testing purposes)
+          {data.mastoFeedRaw ? "refetch" : "fetch"}
         </Button>
 
         <Show when={message()}>
