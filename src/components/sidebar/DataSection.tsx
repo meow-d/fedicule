@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onMount, Show } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 
 import { update } from "../graph/Graph";
 
@@ -18,7 +18,7 @@ import Button from "../ui/Button";
 
 import { auth, setAuth } from "../../stores/authStore";
 import { loading, setLoading } from "../../stores/loading";
-import { data, MastoFollowRaw, MastoFeedRaw, setData } from "../../stores/data";
+import { data, setData } from "../../stores/data";
 import { Client } from "../../lib/Client";
 import { BskyClient } from "../../lib/bsky/client";
 
@@ -26,6 +26,8 @@ export default function DataSection() {
   const [message, setMessage] = createSignal("");
   const [isError, setIsError] = createSignal(false);
   const [fetchEnabled, setFetchEnabled] = createSignal(true);
+  const [fetchDisplayed, setFetchDisplayed] = createSignal(true);
+  const [loginDisplayed, setLoginDisplayed] = createSignal(true);
   let homeCheckbox, followsCheckbox, fetchAmount, apiSelect, handleInput;
 
   const mastoLogin = async () => {
@@ -120,7 +122,7 @@ export default function DataSection() {
     const processedData = await client.fetchFeed(postCountInt);
     if (data.processedData) {
       processedData.interaction = data.processedData.interaction.concat(
-        processedData.interaction
+        processedData.interaction,
       );
     }
     setData({ processedData });
@@ -129,7 +131,7 @@ export default function DataSection() {
   const setStatus = (
     newMessage: string,
     error?: boolean,
-    loading?: boolean
+    loading?: boolean,
   ) => {
     setIsError(error || false);
     setMessage(newMessage);
@@ -174,13 +176,16 @@ export default function DataSection() {
     }
   };
 
-  const updateFetchEnabled = () => {
-    setFetchEnabled(
-      (apiSelect as unknown as HTMLSelectElement).value === "mastoapi" &&
-        (homeCheckbox as unknown as HTMLInputElement).checked
-    );
+  const updateButtonStates = () => {
+    const follow = followsCheckbox as unknown as HTMLInputElement;
+    const home = homeCheckbox as unknown as HTMLInputElement;
+    const api = apiSelect as unknown as HTMLSelectElement;
+
+    setFetchEnabled(follow.checked || home.checked);
+    setFetchDisplayed(api.value !== "mastoapi" || auth.loggedIn);
+    setLoginDisplayed(api.value != "bsky");
   };
-  onMount(updateFetchEnabled);
+  onMount(updateButtonStates);
 
   return (
     <Section title="Data" open={!data.processedData}>
@@ -191,11 +196,11 @@ export default function DataSection() {
           id="api"
           disabled={loading() || auth.loggedIn}
           ref={apiSelect}
-          onChange={updateFetchEnabled}
+          onChange={updateButtonStates}
         >
           <option value="mastoapi">Mastodon</option>
+          <option value="bsky">Bluesky</option>
           {/* TODO */}
-          {/* <option value="bsky">Bluesky</option> */}
           {/* <option value="misskey">Misskey</option> */}
         </select>
       </div>
@@ -217,13 +222,14 @@ export default function DataSection() {
         <Checkbox
           name="follows"
           ref={followsCheckbox}
+          onChange={updateButtonStates}
           checked={true}
         ></Checkbox>
         <Checkbox
           name="home"
           displayName="home feed"
           ref={homeCheckbox}
-          onChange={updateFetchEnabled}
+          onChange={updateButtonStates}
         ></Checkbox>
       </div>
 
@@ -235,12 +241,13 @@ export default function DataSection() {
           id="fetch-amount"
           value="100"
           ref={fetchAmount}
+          onChange={updateButtonStates}
           disabled={loading()}
         />
       </div>
 
       <div>
-        <Show when={!auth.loggedIn}>
+        <Show when={loginDisplayed() && !auth.loggedIn}>
           <Button disabled={loading()} onclick={mastoLogin}>
             login
           </Button>
@@ -252,12 +259,11 @@ export default function DataSection() {
           </Button>
         </Show>
 
-        <Button
-          disabled={(fetchEnabled() && !auth.loggedIn) || loading()}
-          onClick={startFetch}
-        >
-          {data.mastoFeedRaw ? "refetch" : "fetch"}
-        </Button>
+        <Show when={fetchDisplayed()}>
+          <Button disabled={!fetchEnabled() || loading()} onClick={startFetch}>
+            {data.mastoFeedRaw ? "refetch" : "fetch"}
+          </Button>
+        </Show>
 
         <Show when={message()}>
           <Message message={message()} isError={isError()} />
