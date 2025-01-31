@@ -26,8 +26,8 @@ export default function DataSection() {
   const [message, setMessage] = createSignal("");
   const [isError, setIsError] = createSignal(false);
   const [fetchEnabled, setFetchEnabled] = createSignal(true);
-  const [fetchDisplayed, setFetchDisplayed] = createSignal(true);
-  const [loginDisplayed, setLoginDisplayed] = createSignal(true);
+  const [fetchVisible, setFetchVisible] = createSignal(true);
+  const [loginVisible, setLoginVisible] = createSignal(true);
   let homeCheckbox, followsCheckbox, fetchAmount, apiSelect, handleInput;
 
   const mastoLogin = async () => {
@@ -182,8 +182,8 @@ export default function DataSection() {
     const api = apiSelect as unknown as HTMLSelectElement;
 
     setFetchEnabled(follow.checked || home.checked);
-    setFetchDisplayed(api.value !== "mastoapi" || auth.loggedIn);
-    setLoginDisplayed(api.value != "bsky");
+    setFetchVisible(api.value !== "mastoapi" || auth.loggedIn);
+    setLoginVisible(api.value != "bsky");
   };
   onMount(updateButtonStates);
 
@@ -247,7 +247,7 @@ export default function DataSection() {
       </div>
 
       <div>
-        <Show when={loginDisplayed() && !auth.loggedIn}>
+        <Show when={loginVisible() && !auth.loggedIn}>
           <Button disabled={loading()} onclick={mastoLogin}>
             login
           </Button>
@@ -259,7 +259,7 @@ export default function DataSection() {
           </Button>
         </Show>
 
-        <Show when={fetchDisplayed()}>
+        <Show when={fetchVisible()}>
           <Button disabled={!fetchEnabled() || loading()} onClick={startFetch}>
             {data.mastoFeedRaw ? "refetch" : "fetch"}
           </Button>
