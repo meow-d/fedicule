@@ -18,11 +18,21 @@ aside {
   );
   box-shadow: 1px 0 10px #0000005f;
   text-shadow: 1px 2px 10px #0000004b;
+
+  transition: width 0.3s cubic-bezier(0, 1.13, 0, 0.92);
+  margin-bottom: auto;
+
+  &.collasped {
+    width: 1.3em;
+    height: 1.2em;
+    border-radius: 0 0 3px 0;
+  }
 }
 
-/* TODO */
 #collapseButton {
-  display: none;
+  width: fit-content;
+  background: none;
+  color: white;
 }
 
 /* header */
