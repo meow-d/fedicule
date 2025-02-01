@@ -1,6 +1,7 @@
 .label {
   font-weight: 400;
   font-size: 1em;
+  user-select: none;
 }
 
 .checkbox {
