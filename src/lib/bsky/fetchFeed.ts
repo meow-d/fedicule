@@ -5,83 +5,103 @@ import {
   AppBskyFeedGetRepostedBy,
 } from "@atcute/client/lexicons";
 
-interface BskyFeedRaw {
-  posts: AppBskyFeedDefs.FeedViewPost[];
+export interface BskyFeedRaw {
   threads: AppBskyFeedDefs.ThreadViewPost[];
-  likes: AppBskyFeedGetLikes.Output[];
-  boosts: AppBskyFeedGetRepostedBy.Output[];
+  likes: {
+    post: AppBskyFeedDefs.PostView;
+    likes: AppBskyFeedGetLikes.Output;
+  }[];
+  reposts: {
+    post: AppBskyFeedDefs.PostView;
+    reposts: AppBskyFeedGetRepostedBy.Output;
+  }[];
 }
 
-export default async function fetchFeed(
-  numberOfPosts: number
-): Promise<BskyFeedRaw> {
-  let posts = await fetchPosts(numberOfPosts);
-  posts = filterBoosts(posts);
-  posts = filterUnique(posts);
+export default async function fetchFeed(numberOfPosts: number): Promise<BskyFeedRaw> {
+  const postRoots = await fetchTimelineRoot(numberOfPosts);
 
-  if (!posts || posts.length === 0)
+  if (!postRoots || postRoots.length === 0) {
     throw new Error("No posts on home timeline!");
+  }
 
-  let threads = (await fetchThreads(posts)) as AppBskyFeedDefs.ThreadViewPost[];
-  threads = filterUnique(threads);
+  const threads = (await fetchThreads(postRoots)) as AppBskyFeedDefs.ThreadViewPost[];
 
-  const likes = await fetchLikes(posts);
-  const boosts = await fetchReposts(posts);
+  const likes = await fetchLikes(postRoots);
+  const reposts = await fetchReposts(postRoots);
 
-  return { posts, threads, likes, boosts };
+  return { threads, likes, reposts };
 }
 
-async function fetchPosts(numberOfPosts: number) {
+async function fetchTimelineRoot(numberOfPosts: number) {
   const data = await rpc.get("app.bsky.feed.getTimeline", {
     params: { limit: numberOfPosts },
   });
-  return data.data.feed;
+
+  const feed = filterBoosts(data.data.feed);
+  let postRoots = mapRoots(feed);
+  postRoots = filterUnique(postRoots);
+  return postRoots;
+
+  function filterBoosts(feed: AppBskyFeedDefs.FeedViewPost[]) {
+    return feed.filter((post) => !post.reason);
+  }
+
+  function mapRoots(feed: AppBskyFeedDefs.FeedViewPost[]): AppBskyFeedDefs.PostView[] {
+    return feed.flatMap((post) => {
+      if (!post.reply?.root) return [];
+      if (post.reply.root.$type !== "app.bsky.feed.defs#postView") return [];
+      return [post.reply.root as AppBskyFeedDefs.PostView];
+    });
+  }
+
+  function filterUnique(items: any): any {
+    return [...new Set(items)];
+  }
 }
 
-async function fetchThreads(posts: AppBskyFeedDefs.FeedViewPost[]) {
-  return await Promise.all(
-    posts.flatMap(async (post) => {
-      if (!post.post.replyCount) return [];
+async function fetchThreads(posts: AppBskyFeedDefs.PostView[]) {
+  const threads = await Promise.all(
+    posts.map(async (post) => {
+      if (!post.replyCount) return;
 
       const data = await rpc.get("app.bsky.feed.getPostThread", {
-        params: { uri: post.post.uri, depth: 1000, parentHeight: 1000 },
+        params: { uri: post.uri, depth: 1000, parentHeight: 1000 },
       });
 
-      if (data.data.thread.$type != "app.bsky.feed.defs#threadViewPost")
-        return [];
+      if (data.data.thread.$type !== "app.bsky.feed.defs#threadViewPost") return;
       return data.data.thread;
     })
   );
+
+  return threads.filter(Boolean);
 }
 
-async function fetchLikes(posts: AppBskyFeedDefs.FeedViewPost[]) {
-  const interactions = [];
+async function fetchLikes(posts: AppBskyFeedDefs.PostView[]) {
+  const interactions: BskyFeedRaw["likes"] = [];
   for (const post of posts) {
-    if (!post.post.likeCount) continue;
+    if (!post.likeCount) continue;
     const data = await rpc.get("app.bsky.feed.getLikes", {
-      params: { uri: post.post.uri },
+      params: { uri: post.uri },
     });
-    interactions.push(data.data);
+    interactions.push({
+      post,
+      likes: data.data,
+    });
   }
   return interactions;
 }
 
-async function fetchReposts(posts: AppBskyFeedDefs.FeedViewPost[]) {
-  const interactions = [];
+async function fetchReposts(posts: AppBskyFeedDefs.PostView[]) {
+  const interactions: BskyFeedRaw["reposts"] = [];
   for (const post of posts) {
-    if (!post.post.repostCount) continue;
+    if (!post.repostCount) continue;
     const data = await rpc.get("app.bsky.feed.getRepostedBy", {
-      params: { uri: post.post.uri },
+      params: { uri: post.uri },
     });
-    interactions.push(data.data);
+    interactions.push({
+      post,
+      reposts: data.data,
+    });
   }
   return interactions;
-}
-
-function filterUnique(items: any): any {
-  return [...new Set(items)];
-}
-
-function filterBoosts(posts: AppBskyFeedDefs.FeedViewPost[]) {
-  return posts.filter((post) => !post.reason);
 }
