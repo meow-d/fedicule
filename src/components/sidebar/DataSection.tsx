@@ -141,7 +141,6 @@ export default function DataSection() {
   const logout = async () => {
     try {
       setStatus({ message: "Logging out...", error: false, loading: true });
-      // TODO: should be tied to client
       setAuth(await revokeToken(auth));
       setStatus({ message: "Logged out", error: false, loading: false });
     } catch (error: any) {
@@ -186,8 +185,6 @@ export default function DataSection() {
             Mastodon
           </option>
           <option value="bsky">Bluesky</option>
-          {/* TODO */}
-          {/* <option value="misskey">Misskey</option> */}
         </select>
       </div>
 
