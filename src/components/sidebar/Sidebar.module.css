@@ -33,6 +33,16 @@ aside {
   width: fit-content;
   background: none;
   color: white;
+  transition: text-shadow 0.6s;
+
+  &:hover {
+    text-shadow: 0 0 1em #ff0000, -0.4em -0.4em 1em #ff0000, -0.4em -0.4em 1em #ff0000;
+  }
+
+  &:active {
+  transition: none;
+  text-shadow: none;
+  }
 }
 
 /* header */
