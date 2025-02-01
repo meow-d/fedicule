@@ -49,7 +49,7 @@ export default function DataSection() {
     }
 
     setStatus("loading", true);
-    client.onProgress((update) => setStatus("message", update));
+    client.onProgress((update: string) => setStatus("message", update));
 
     try {
       if (follows) await fetchFollows(client as Client);
