@@ -3,10 +3,16 @@ import styles from "./Sidebar.module.css";
 
 import DataSection from "./DataSection";
 import SettingsSection from "./SettingsSection";
-import { createSignal, Show } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 
 export default function Sidebar() {
   let [collapsed, setCollapsed] = createSignal(false);
+
+  onMount(() => {
+    const mediaQuery = window.matchMedia("(max-width: 768px)");
+    mediaQuery.addEventListener("change", (e) => setCollapsed(e.matches));
+  });
+
   const toggleCollapsed = () => {
     setCollapsed((prev) => !prev);
   };
