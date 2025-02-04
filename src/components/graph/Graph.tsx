@@ -2,7 +2,7 @@ import { onMount, createEffect, createSignal, Show } from "solid-js";
 
 import { MultiDirectedGraph } from "graphology";
 import ForceSupervisor from "graphology-layout-force/worker";
-import forceAtlas2, { ForceAtlas2Settings } from "graphology-layout-forceatlas2";
+import forceAtlas2 from "graphology-layout-forceatlas2";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
 
 import Sigma from "sigma";
@@ -17,7 +17,8 @@ const [graph, setGraph] = createSignal<MultiDirectedGraph>();
 let renderer: Sigma;
 let container;
 
-// fit community nodes in viewport
+// fitViewportToCommunity
+/** camera zooms in/out to fit all nodes from a community in viewport */
 export function fitViewportToCommunity(community: string) {
   const currentGraph = graph();
   if (!renderer || !currentGraph) return;
@@ -28,6 +29,7 @@ export function fitViewportToCommunity(community: string) {
 // layouts
 let layout: ForceSupervisor | FA2Layout;
 
+/** destorys the pervious layout worker and starts a new one. */
 function switchLayout(layoutName: "force" | "forceAtlas2", graph: MultiDirectedGraph) {
   if (layout) layout.stop();
 
@@ -43,12 +45,14 @@ function switchLayout(layoutName: "force" | "forceAtlas2", graph: MultiDirectedG
   layout.start();
 }
 
+// main
+/** (re)creates the graph and renderer */
 export function update() {
   if (!dataStore.processedData) return;
   setGraph(updateGraph(dataStore.processedData));
   const currentGraph = graph();
   if (!currentGraph) return;
-  switchLayout(settingsStore.layout, currentGraph);
+  switchLayout(settings.layout, currentGraph);
 
   if (renderer) renderer.kill();
   if (!container) return;
@@ -83,7 +87,6 @@ export function Graph() {
       }}
       ref={container}
     >
-      {/* TODO: you still need to refresh */}
       <Show when={!graph()}>
         <p>no graph data... go fetch some posts!</p>
       </Show>
