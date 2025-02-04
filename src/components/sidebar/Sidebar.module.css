@@ -1,5 +1,4 @@
 ::selection {
-  /* TODO change this */
   background-color: rgb(255, 103, 164);
   color: #330022;
 }
@@ -79,9 +78,11 @@ h2 {
 .content {
   flex: 1;
   overflow-y: auto;
-  scrollbar-gutter: stable both-edges;
+  scrollbar-gutter: stable;
   padding: 1em;
-  /* TODO style scrollbar */
+
+  scrollbar-color: #5d007e #ffffff4c;
+  scrollbar-width: thin;
 
   display: flex;
   flex-direction: column;
