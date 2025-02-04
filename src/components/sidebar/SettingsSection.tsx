@@ -19,6 +19,11 @@ export default function SettingsSection() {
   return (
     <Section title="Settings" open={!!data.processedData}>
       <div>
+        <label for="search">Search (wip)</label>
+        <input type="text" onInput={(e) => setSettings("search", e.target.value)} />
+      </div>
+
+      <div>
         <label for="zoom">Zoom</label>
         <input
           type="range"
@@ -26,11 +31,7 @@ export default function SettingsSection() {
           max="4"
           step="0.1"
           value={settings.zoomAmount}
-          onInput={(e) =>
-            setSettings({
-              zoomAmount: parseFloat((e.target as HTMLInputElement).value),
-            })
-          }
+          onInput={(e) => setSettings("zoomAmount", parseFloat(e.target.value))}
         />
       </div>
 
@@ -45,12 +46,7 @@ export default function SettingsSection() {
 
       <div>
         <label for="layout">Layout algorithm</label>
-        <select
-          name="layout"
-          id="layout"
-          onChange={changeLayout}
-          value={settings.layout}
-        >
+        <select name="layout" id="layout" onChange={changeLayout} value={settings.layout}>
           <option value="force">force</option>
           <option value="forceAtlas2">ForceAtlas2 (not draggable)</option>
         </select>

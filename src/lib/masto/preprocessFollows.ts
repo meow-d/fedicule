@@ -1,15 +1,8 @@
-import {
-  MastoAccount,
-  MastoFamiliarFollower,
-  MastoFollowRaw,
-  Interaction,
-  ProcessedData,
-  data,
-} from "../../stores/data";
+import { Interaction, ProcessedData, data } from "../../stores/data";
+import { MastoFamiliarFollower, MastoFollowRaw } from "./types";
+import { MastoAccount } from "./types";
 
-export default async function preprocessFollows(
-  raw: MastoFollowRaw
-): Promise<ProcessedData> {
+export default async function preprocessFollows(raw: MastoFollowRaw): Promise<ProcessedData> {
   if (!data.mastoAccount) throw new Error("User mastodon account not found");
   const userAccount: MastoAccount = data.mastoAccount;
   const interactions: Interaction[] = [];
@@ -27,10 +20,7 @@ export default async function preprocessFollows(
   return { interaction: interactions };
 }
 
-function preprocessFamiliarFollowers(
-  raw: MastoFollowRaw,
-  interactions: Interaction[]
-) {
+function preprocessFamiliarFollowers(raw: MastoFollowRaw, interactions: Interaction[]) {
   const familiarFollowers: MastoFamiliarFollower[] = raw.familiarFollowers;
   const following: MastoAccount[] = raw.following;
   const followers: MastoAccount[] = raw.followers;
@@ -51,11 +41,7 @@ function preprocessFamiliarFollowers(
   });
 }
 
-function addFollow(
-  sender: MastoAccount,
-  receiver: MastoAccount,
-  interactions: Interaction[]
-) {
+function addFollow(sender: MastoAccount, receiver: MastoAccount, interactions: Interaction[]) {
   interactions.push({
     sender: {
       label: sender.display_name,

@@ -1,21 +1,6 @@
-import { rpc } from "./rpc";
-import {
-  AppBskyFeedDefs,
-  AppBskyFeedGetLikes,
-  AppBskyFeedGetRepostedBy,
-} from "@atcute/client/lexicons";
-
-export interface BskyFeedRaw {
-  threads: AppBskyFeedDefs.ThreadViewPost[];
-  likes: {
-    post: AppBskyFeedDefs.PostView;
-    likes: AppBskyFeedGetLikes.Output;
-  }[];
-  reposts: {
-    post: AppBskyFeedDefs.PostView;
-    reposts: AppBskyFeedGetRepostedBy.Output;
-  }[];
-}
+import type { BskyFeedRaw } from "./types";
+import { getRpc } from "./rpc";
+import { AppBskyFeedDefs } from "@atcute/client/lexicons";
 
 export default async function fetchFeed(numberOfPosts: number): Promise<BskyFeedRaw> {
   const postRoots = await fetchTimelineRoot(numberOfPosts);
@@ -33,6 +18,7 @@ export default async function fetchFeed(numberOfPosts: number): Promise<BskyFeed
 }
 
 async function fetchTimelineRoot(numberOfPosts: number) {
+  const rpc = await getRpc();
   const data = await rpc.get("app.bsky.feed.getTimeline", {
     params: { limit: numberOfPosts },
   });
@@ -60,6 +46,8 @@ async function fetchTimelineRoot(numberOfPosts: number) {
 }
 
 async function fetchThreads(posts: AppBskyFeedDefs.PostView[]) {
+  const rpc = await getRpc();
+
   const threads = await Promise.all(
     posts.map(async (post) => {
       if (!post.replyCount) return;
@@ -77,6 +65,8 @@ async function fetchThreads(posts: AppBskyFeedDefs.PostView[]) {
 }
 
 async function fetchLikes(posts: AppBskyFeedDefs.PostView[]) {
+  const rpc = await getRpc();
+
   const interactions: BskyFeedRaw["likes"] = [];
   for (const post of posts) {
     if (!post.likeCount) continue;
@@ -92,6 +82,8 @@ async function fetchLikes(posts: AppBskyFeedDefs.PostView[]) {
 }
 
 async function fetchReposts(posts: AppBskyFeedDefs.PostView[]) {
+  const rpc = await getRpc();
+
   const interactions: BskyFeedRaw["reposts"] = [];
   for (const post of posts) {
     if (!post.repostCount) continue;

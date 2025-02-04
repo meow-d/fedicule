@@ -5,9 +5,23 @@ import fetchFeed from "./fetchFeed";
 import preprocessFeed from "./preprocessFeed";
 import fetchFollows from "./fetchFollows";
 import preprocessFollows from "./preprocessFollows";
+import { createApp, getToken, revokeToken } from "./auth";
 
-// TODO use callback for status messages
 export class MastoClient extends Client {
+  // auth
+  createAuthUrl(handle: string) {
+    return createApp(handle);
+  }
+
+  finalizeAuth(url: Location) {
+    return getToken(url);
+  }
+
+  logout() {
+    return revokeToken();
+  }
+
+  // data
   async fetchFeed(numberOfPosts: number): Promise<ProcessedData> {
     this.emitProgress("Fetching feed...");
     const raw = await fetchFeed(numberOfPosts);

@@ -1,5 +1,5 @@
 import { get, getNextPageUrl } from "./mastoApi";
-import { MastoFeedRaw, MastoPost, MastoLikesOrBoost } from "../../stores/data";
+import { MastoFeedRaw, MastoPost, MastoLikesOrBoost } from "./types";
 
 export default async function fetchFeed(
   numberOfPosts: number

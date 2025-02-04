@@ -1,43 +1,54 @@
 import { post, postParams } from "./mastoApi";
-import { type Auth } from "../../stores/authStore";
+import { auth, setAuth, type Auth } from "../../stores/authStore";
 
-async function createApp(instance: string, auth: Auth): Promise<Auth> {
+export async function createApp(handle: string) {
+  // TODO: yeah why tf did you ask them for the full handle
+  const instance = handle.split("@")[2];
+  if (!instance) {
+    throw new Error("Invalid handle");
+  }
+
+  const clientName = import.meta.env.VITE_CLIENT_NAME;
+  const redirectUri = import.meta.env.VITE_OAUTH_MASTO_REDIRECT_URI;
+
   const response = await post("/api/v1/apps", {
-    client_name: auth.clientName,
-    redirect_uris: auth.clientUrl,
+    client_name: clientName,
+    redirect_uris: redirectUri,
     scopes: "read",
   });
   const data = await response.json();
 
-  return {
-    ...auth,
+  const params = {
+    response_type: "code",
+    client_id: data.client_id,
+    redirect_uri: redirectUri,
+    scope: "read",
+  };
+  const url = `https://${instance}/oauth/authorize?${new URLSearchParams(params).toString()}`;
+
+  setAuth({
+    loggedIn: true,
+    type: "mastoapi",
     instance,
     clientId: data.client_id,
     clientSecret: data.client_secret,
-  };
+  });
+
+  return url;
 }
 
-function redirectToInstance(auth: Auth) {
+export async function getToken(url: Location) {
+  const urlParams = new URLSearchParams(url.search);
+  const code = urlParams.get("code");
+  const redirectUri = import.meta.env.VITE_OAUTH_MASTO_REDIRECT_URI;
+
+  if (!auth.loggedIn || auth.type !== "mastoapi") {
+    throw new Error("Not logged in");
+  }
   if (!auth.clientId || !auth.clientSecret) {
     throw new Error("Client ID or Client Secret not found");
   }
-
-  const params = {
-    response_type: "code",
-    client_id: auth.clientId,
-    redirect_uri: auth.clientUrl,
-    scope: "read",
-  };
-  const url = `https://${auth.instance}/oauth/authorize?${new URLSearchParams(
-    params
-  ).toString()}`;
-  window.location.href = url;
-}
-
-async function getToken(code: string, auth: Auth): Promise<Auth> {
-  if (!auth.clientId || !auth.clientSecret) {
-    throw new Error("Client ID or Client Secret not found");
-  }
+  if (!code) throw new Error("No code found");
 
   const response = await postParams("/oauth/token", {
     grant_type: "authorization_code",
@@ -45,18 +56,16 @@ async function getToken(code: string, auth: Auth): Promise<Auth> {
     scope: "read",
     client_id: auth.clientId,
     client_secret: auth.clientSecret,
-    redirect_uri: auth.clientUrl,
+    redirect_uri: redirectUri,
   });
   const data = await response.json();
 
-  return {
-    ...auth,
-    token: data.access_token,
-    loggedIn: true,
-  };
+  setAuth({ loggedIn: true, token: data.access_token });
 }
 
-async function revokeToken(auth: Auth): Promise<Auth> {
+export async function revokeToken() {
+  if (!auth.loggedIn || auth.type !== "mastoapi") throw new Error("Not logged in");
+
   if (auth.token && auth.clientId && auth.clientSecret) {
     try {
       await postParams("/oauth/revoke", {
@@ -67,13 +76,5 @@ async function revokeToken(auth: Auth): Promise<Auth> {
     } catch (error) {}
   }
 
-  return {
-    ...auth,
-    loggedIn: false,
-    token: undefined,
-    clientId: undefined,
-    clientSecret: undefined,
-  };
+  setAuth("loggedIn", false);
 }
-
-export { createApp, redirectToInstance, getToken, revokeToken };

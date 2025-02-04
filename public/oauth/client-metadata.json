@@ -1,0 +1,12 @@
+{
+  "client_id": "https://fedicule.pages.dev/oauth/client-metadata.json",
+  "application_type": "web",
+  "client_name": "fedicule",
+  "client_uri": "https://fedicule.pages.dev",
+  "dpop_bound_access_tokens": true,
+  "grant_types": ["authorization_code", "refresh_token"],
+  "redirect_uris": ["https://fedicule.pages.dev/?oauth=bsky"],
+  "response_types": ["code"],
+  "scope": "atproto transition:generic",
+  "token_endpoint_auth_method": "none"
+}

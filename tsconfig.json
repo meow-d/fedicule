@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["vite/client", "@atcute/bluesky/lexicons"],
+    "types": ["vite/client", "node", "@atcute/bluesky/lexicons"],
     "noEmit": true,
     "isolatedModules": true
   }

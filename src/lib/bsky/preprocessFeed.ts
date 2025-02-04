@@ -1,6 +1,6 @@
 import { AppBskyActorDefs, AppBskyFeedDefs } from "@atcute/client/lexicons";
 import { ProcessedData, Interaction, Node } from "../../stores/data";
-import { BskyFeedRaw } from "./fetchFeed";
+import { BskyFeedRaw } from "./types";
 
 export default function preprocessFeed(raw: BskyFeedRaw): ProcessedData {
   const interactions: Interaction[] = [];

@@ -1,12 +1,8 @@
-import {
-  Interaction,
-  MastoFeedRaw,
-  Node,
-  ProcessedData,
-} from "../../stores/data";
+import { Interaction, Node, ProcessedData } from "../../stores/data";
+import { MastoFeedRaw, mastoMentions as MastoMentions, MastoPost } from "./types";
 import { fetchUser } from "./user";
 
-export default function preprocessPosts(data: MastoFeedRaw): ProcessedData {
+export default function preprocessFeed(data: MastoFeedRaw): ProcessedData {
   const interactions: Interaction[] = [];
 
   preprocessMentions(data.posts, interactions);
@@ -16,11 +12,11 @@ export default function preprocessPosts(data: MastoFeedRaw): ProcessedData {
   return { interaction: interactions };
 }
 
-function preprocessMentions(posts: any[], interactions: Interaction[]) {
+function preprocessMentions(posts: MastoPost[], interactions: Interaction[]) {
   posts.forEach((post) => {
     if (!post.mentions) return;
 
-    post.mentions.forEach((mention: { [x: string]: any }) => {
+    post.mentions.forEach((mention) => {
       interactions.push({
         sender: {
           label: post.account.acct,
@@ -34,7 +30,7 @@ function preprocessMentions(posts: any[], interactions: Interaction[]) {
     });
   });
 
-  function getMentionInfo(mention: any, callback: (node: Node) => void): Node {
+  function getMentionInfo(mention: MastoMentions, callback: (node: Node) => void): Node {
     const node: Node = {
       label: mention.acct,
       mastoApiId: mention.id,
@@ -53,11 +49,7 @@ function preprocessMentions(posts: any[], interactions: Interaction[]) {
   }
 }
 
-function preprocessLikesOrBoost(
-  raw: any[],
-  interactionType: "boost" | "like",
-  interactions: Interaction[]
-) {
+function preprocessLikesOrBoost(raw: any[], interactionType: "boost" | "like", interactions: Interaction[]) {
   raw.forEach((interaction) => {
     interactions.push({
       sender: {

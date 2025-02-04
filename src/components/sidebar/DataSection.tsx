@@ -1,18 +1,16 @@
-import { createEffect, createMemo, createSignal, onMount, Show } from "solid-js";
+import { createEffect, createMemo, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { update } from "../graph/Graph";
 
 import { MastoClient } from "../../lib/masto/client";
 
-import { createApp, getToken, redirectToInstance, revokeToken } from "../../lib/masto/auth";
-
 import Section from "../ui/Section";
 import Checkbox from "../ui/Checkbox";
 import Message from "../ui/Message";
 import Button from "../ui/Button";
 
-import { auth, setAuth } from "../../stores/authStore";
+import { auth } from "../../stores/authStore";
 import { data, setData } from "../../stores/data";
 import { Client } from "../../lib/Client";
 import { BskyClient } from "../../lib/bsky/client";
@@ -20,6 +18,28 @@ import { BskyClient } from "../../lib/bsky/client";
 export default function DataSection() {
   // status
   const [status, setStatus] = createStore({ message: "", error: false, loading: false });
+
+  // client
+  let client: Client;
+  const mastoClient = new MastoClient();
+  const bskyClient = new BskyClient();
+
+  const getClient = (api: "mastoapi" | "bsky") => {
+    if (api === "mastoapi") {
+      client = mastoClient;
+    } else if (api === "bsky") {
+      client = bskyClient;
+    }
+    throw new Error("Invalid API");
+  };
+
+  createEffect(() => {
+    if (auth.loggedIn) {
+      client = getClient(auth.type);
+    } else {
+      client = getClient(inputs.api);
+    }
+  });
 
   // fetch
   const startFetch = async () => {
@@ -37,19 +57,9 @@ export default function DataSection() {
       return;
     }
 
-    setData({ processedData: undefined });
-
-    let client;
-    if (api === "mastoapi") {
-      client = new MastoClient();
-    } else if (api === "bsky") {
-      client = await BskyClient.create(handle);
-    } else {
-      throw new Error("Not implemented");
-    }
-
-    setStatus("loading", true);
     client.onProgress((update: string) => setStatus("message", update));
+    setData({ processedData: undefined });
+    setStatus("loading", true);
 
     try {
       if (follows) await fetchFollows(client as Client);
@@ -81,7 +91,7 @@ export default function DataSection() {
   };
 
   // login
-  const mastoLogin = async () => {
+  const login = async () => {
     try {
       const handle = inputs.handle;
       const api = inputs.api;
@@ -89,22 +99,15 @@ export default function DataSection() {
       if (!handle || !api) {
         throw new Error("Fields are not filled in");
       }
-      if (api === "bsky") {
-        throw new Error("No login required for Bluesky");
-      }
       if (auth.loggedIn) {
         throw new Error("Already logged in");
       }
 
-      const instance = handle.split("@")[2];
-      if (!instance) {
-        throw new Error("Invalid handle");
-      }
+      if (!client) throw new Error("Client not found...?");
+      const url = await client.createAuthUrl(handle);
 
-      setAuth(await createApp(instance, auth));
-
-      setAuth({ handle });
-      redirectToInstance(auth);
+      await new Promise((r) => setTimeout(r, 200));
+      window.location.assign(url);
     } catch (error: any) {
       console.error(error);
     }
@@ -112,19 +115,24 @@ export default function DataSection() {
 
   onMount(async () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
-    if (!code) return;
+    const api = urlParams.get("oauth");
+    if (!api) return;
+    if (api !== "mastoapi" && api !== "bsky") {
+      setStatus({ message: "Invalid API", error: true, loading: false });
+      return;
+    }
 
     try {
       setStatus({
-        message: "Getting token from code...",
+        message: "Logging you in...",
         error: false,
         loading: true,
       });
+      if (!client) throw new Error("Not logged in?");
+      await client.finalizeAuth(window.location);
       window.history.replaceState(null, "hello safari user", "/");
-      setAuth(await getToken(code, auth));
       setStatus({
-        message: "Logged in..",
+        message: "Logged in :3",
         error: false,
         loading: false,
       });
@@ -141,7 +149,8 @@ export default function DataSection() {
   const logout = async () => {
     try {
       setStatus({ message: "Logging out...", error: false, loading: true });
-      setAuth(await revokeToken(auth));
+      if (!client) throw new Error("urmmm client not found...  waht the fuck this isn't suppoed to hapen");
+      await client.logout();
       setStatus({ message: "Logged out", error: false, loading: false });
     } catch (error: any) {
       console.error(error);
@@ -161,14 +170,11 @@ export default function DataSection() {
     follows: true,
     home: false,
     api: "mastoapi",
-    handle: auth.handle ?? "",
+    handle: auth.loggedIn && auth.type === "mastoapi" ? auth.handle : "",
     postsNo: 100,
   });
 
-  const postsNoVisible = createMemo(() => inputs.home);
-  const loginVisible = createMemo(() => inputs.api === "mastoapi" && !auth.loggedIn);
-  const fetchEnabled = createMemo(() => inputs.follows || inputs.home);
-  const fetchVisible = createMemo(() => inputs.api !== "mastoapi" || !!auth.loggedIn);
+  const fetchDisabled = createMemo(() => !inputs.follows && !inputs.home && !status.loading);
 
   return (
     <Section title="Data" open={!data.processedData}>
@@ -210,7 +216,7 @@ export default function DataSection() {
         <Checkbox name="home" displayName="home feed" onChange={(e) => setInputs("home", e.target.checked)}></Checkbox>
       </div>
 
-      <Show when={postsNoVisible}>
+      <Show when={inputs.home}>
         <div>
           <label for="fetch-amount">Home feed posts no.</label>
           <input
@@ -229,20 +235,16 @@ export default function DataSection() {
         <Show
           when={auth.loggedIn}
           fallback={
-            <Show when={loginVisible()}>
-              <Button disabled={status.loading} onclick={mastoLogin}>
-                login
-              </Button>
-            </Show>
+            <Button disabled={status.loading} onclick={login}>
+              login
+            </Button>
           }
         >
           <Button disabled={status.loading} onclick={logout}>
             logout
           </Button>
-        </Show>
 
-        <Show when={fetchVisible()}>
-          <Button disabled={!fetchEnabled() || status.loading} onClick={startFetch}>
+          <Button disabled={fetchDisabled()} onClick={startFetch}>
             {data.mastoFeedRaw ? "refetch" : "fetch"}
           </Button>
         </Show>

@@ -11,13 +11,15 @@ interface Settings {
   userFilter: UserFilter;
   layout: "force" | "forceAtlas2";
   zoomAmount: number;
+  search: string;
 }
 
 const [settings, setSettings] = makePersisted(
   createStore<Settings>({
     userFilter: UserFilter.None,
     layout: "force",
-    zoomAmount: 1,
+    zoomAmount: 1.5,
+    search: "",
   })
 );
 

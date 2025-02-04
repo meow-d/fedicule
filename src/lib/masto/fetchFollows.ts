@@ -1,9 +1,6 @@
 import { get, getNextPageUrl } from "./mastoApi";
-import {
-  MastoAccount,
-  MastoFamiliarFollower,
-  MastoFollowRaw,
-} from "../../stores/data";
+import { MastoFamiliarFollower, MastoFollowRaw } from "./types";
+import { MastoAccount } from "./types";
 
 export default async function fetchFollows(): Promise<MastoFollowRaw> {
   const mastoAccount = await getAccount();
