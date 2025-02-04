@@ -2,9 +2,7 @@ import { onMount, createEffect, createSignal, Show } from "solid-js";
 
 import { MultiDirectedGraph } from "graphology";
 import ForceSupervisor from "graphology-layout-force/worker";
-import forceAtlas2, {
-  ForceAtlas2Settings,
-} from "graphology-layout-forceatlas2";
+import forceAtlas2, { ForceAtlas2Settings } from "graphology-layout-forceatlas2";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
 
 import Sigma from "sigma";
@@ -15,24 +13,22 @@ import { settings as settingsStore } from "../../stores/settings";
 import { updateGraph } from "./updateGraph";
 import { updateRenderer } from "./updateRenderer";
 
-let graph: MultiDirectedGraph;
+const [graph, setGraph] = createSignal<MultiDirectedGraph>();
 let renderer: Sigma;
 let container;
 
 // fit community nodes in viewport
 export function fitViewportToCommunity(community: string) {
-  if (!renderer) return;
-  const nodes = graph.filterNodes((_, attr) => attr.community === community);
+  const currentGraph = graph();
+  if (!renderer || !currentGraph) return;
+  const nodes = currentGraph.filterNodes((_, attr) => attr.community === community);
   fitViewportToNodes(renderer, nodes);
 }
 
 // layouts
 let layout: ForceSupervisor | FA2Layout;
 
-function switchLayout(
-  layoutName: "force" | "forceAtlas2",
-  graph: MultiDirectedGraph
-) {
+function switchLayout(layoutName: "force" | "forceAtlas2", graph: MultiDirectedGraph) {
   if (layout) layout.stop();
 
   if (layoutName === "force") {
@@ -49,17 +45,21 @@ function switchLayout(
 
 export function update() {
   if (!dataStore.processedData) return;
-  graph = updateGraph(dataStore.processedData);
-  switchLayout(settingsStore.layout, graph);
+  setGraph(updateGraph(dataStore.processedData));
+  const currentGraph = graph();
+  if (!currentGraph) return;
+  switchLayout(settingsStore.layout, currentGraph);
 
   if (renderer) renderer.kill();
   if (!container) return;
-  renderer = updateRenderer(container, graph);
+  renderer = updateRenderer(container, currentGraph);
 }
 
 export function Graph() {
   createEffect(() => {
-    switchLayout(settingsStore.layout, graph);
+    const currentGraph = graph();
+    if (!currentGraph) return;
+    switchLayout(settingsStore.layout, currentGraph);
   });
 
   onMount(update);
@@ -78,7 +78,7 @@ export function Graph() {
       ref={container}
     >
       {/* TODO: you still need to refresh */}
-      <Show when={!graph}>
+      <Show when={!graph()}>
         <p>no graph data... go fetch some posts!</p>
       </Show>
     </div>
