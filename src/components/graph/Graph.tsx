@@ -9,7 +9,7 @@ import Sigma from "sigma";
 import { fitViewportToNodes } from "@sigma/utils";
 
 import { data as dataStore } from "../../stores/data";
-import { settings as settingsStore } from "../../stores/settings";
+import { settings, setSettings } from "../../stores/settings";
 import { updateGraph } from "./updateGraph";
 import { updateRenderer } from "./updateRenderer";
 
@@ -36,8 +36,8 @@ function switchLayout(layoutName: "force" | "forceAtlas2", graph: MultiDirectedG
       isNodeFixed: (_, attr) => attr.highlighted,
     });
   } else if (layoutName === "forceAtlas2") {
-    const settings = forceAtlas2.inferSettings(graph);
-    layout = new FA2Layout(graph, { settings: { ...settings } });
+    const fa2settings = forceAtlas2.inferSettings(graph);
+    layout = new FA2Layout(graph, { settings: { ...fa2settings } });
   }
 
   layout.start();
@@ -53,13 +53,19 @@ export function update() {
   if (renderer) renderer.kill();
   if (!container) return;
   renderer = updateRenderer(container, currentGraph);
+  renderer.getCamera().addListener("updated", (e) => setSettings("zoomAmount", e.ratio));
 }
 
 export function Graph() {
   createEffect(() => {
     const currentGraph = graph();
     if (!currentGraph) return;
-    switchLayout(settingsStore.layout, currentGraph);
+    switchLayout(settings.layout, currentGraph);
+  });
+
+  createEffect(() => {
+    if (!renderer) return;
+    renderer.getCamera().animatedZoom(settings.zoomAmount);
   });
 
   onMount(update);

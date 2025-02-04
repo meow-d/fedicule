@@ -19,7 +19,7 @@ export default function SettingsSection() {
   return (
     <Section title="Settings" open={!!data.processedData}>
       <div>
-        <label for="zoom">Zoom (wip)</label>
+        <label for="zoom">Zoom</label>
         <input
           type="range"
           min="0.1"
