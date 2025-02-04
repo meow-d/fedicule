@@ -1,5 +1,6 @@
-import { BskyFollowRaw, Interaction, ProcessedData } from "../../stores/data";
-import { AppBskyActorDefs } from "@atcute/client/lexicons";
+import type { AppBskyActorDefs } from "@atcute/client/lexicons";
+import type { Interaction, ProcessedData } from "../../stores/data";
+import type { BskyFollowRaw } from "./types";
 
 export default async function preprocessFollows(
   raw: BskyFollowRaw,
@@ -56,9 +57,7 @@ function addFollow(
     receiver: {
       label: receiver.handle,
       bskyDid: receiver.did,
-      display_name: receiver.displayName
-        ? receiver.displayName
-        : receiver.handle,
+      display_name: receiver.displayName ? receiver.displayName : receiver.handle,
       image: receiver.avatar ? receiver.avatar : "",
     },
     type: "follow",

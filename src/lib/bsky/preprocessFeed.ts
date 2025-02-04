@@ -1,6 +1,6 @@
-import { AppBskyActorDefs, AppBskyFeedDefs } from "@atcute/client/lexicons";
-import { ProcessedData, Interaction, Node } from "../../stores/data";
-import { BskyFeedRaw } from "./types";
+import type { AppBskyActorDefs, AppBskyFeedDefs } from "@atcute/client/lexicons";
+import type { ProcessedData, Interaction, Node } from "../../stores/data";
+import type { BskyFeedRaw } from "./types";
 
 export default function preprocessFeed(raw: BskyFeedRaw): ProcessedData {
   const interactions: Interaction[] = [];
@@ -31,7 +31,7 @@ function preprocessThreads(threads: AppBskyFeedDefs.ThreadViewPost[], interactio
     if (post.replies) {
       post.replies.forEach((reply) => {
         if (reply.$type === "app.bsky.feed.defs#threadViewPost") {
-          interactions.push(createMention(post.post.author, reply.post.author));
+          interactions.push(createMention(reply.post.author, post.post.author));
           processPost(reply);
         }
       });
@@ -68,7 +68,7 @@ function preprocessReposts(raw: BskyFeedRaw["reposts"], interactions: Interactio
       interactions.push({
         sender: createNode(interaction),
         receiver: createNode(post.post.author as AppBskyActorDefs.ProfileView),
-        type: "like",
+        type: "boost",
       });
     });
   });
