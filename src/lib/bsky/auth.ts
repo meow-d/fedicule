@@ -28,6 +28,12 @@ export async function createAuthUrl(handle: string): Promise<string | URL> {
     scope: "atproto transition:generic",
   });
 
+  setAuth({
+    type: "bsky",
+    loggedIn: false,
+    did: identity.id,
+  });
+
   return authUrl;
   // TODO: user aborted message would be nice..
 }
@@ -40,7 +46,7 @@ export async function finalizeAuth(url: Location) {
   // atcute already stores credentials, so we're not doing that again
   // and theirs is 1000% better anyways
   setAuth({
-    ...auth,
+    type: "bsky",
     loggedIn: true,
     did: agent.sub,
   });
@@ -49,11 +55,13 @@ export async function finalizeAuth(url: Location) {
 }
 
 export async function logout() {
-  if (!auth.loggedIn || auth.type !== "bsky") return;
+  if (auth.type !== "bsky") {
+    setAuth("type", "");
+    return;
+  }
 
   const did = auth.did;
-  setAuth({ ...auth, loggedIn: false });
-  if (!did) return;
+  setAuth("type", "");
 
   try {
     const session = await getSession(did, { allowStale: true });

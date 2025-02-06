@@ -41,7 +41,7 @@ const oauthPlugin: Plugin = {
 
 
 export default defineConfig({
-  plugins: [solidPlugin()],
+  plugins: [solidPlugin(), oauthPlugin],
   server: {
     host: SERVER_HOST,
     port: SERVER_PORT,

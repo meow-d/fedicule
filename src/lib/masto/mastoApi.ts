@@ -1,7 +1,7 @@
 import { auth } from "../../stores/authStore";
 
 export async function post(endpoint: string, body?: Record<string, string>): Promise<any> {
-  if (!auth.loggedIn || auth.type !== "mastoapi") throw new Error("Not logged in");
+  if (auth.type !== "mastoapi") throw new Error("Not logged in");
 
   const response = await fetch(`https://${auth.instance}${endpoint}`, {
     method: "POST",
@@ -20,7 +20,7 @@ export async function post(endpoint: string, body?: Record<string, string>): Pro
 }
 
 export async function postParams(endpoint: string, body?: Record<string, string>) {
-  if (!auth.loggedIn || auth.type !== "mastoapi") throw new Error("Not logged in");
+  if (auth.type !== "mastoapi") throw new Error("Not logged in");
 
   const searchParams = new URLSearchParams(body).toString();
   const url = `https://${auth.instance}${endpoint}?${searchParams}`;
@@ -37,7 +37,7 @@ export async function postParams(endpoint: string, body?: Record<string, string>
 }
 
 export async function get(endpoint: string, params?: Record<string, any> | string): Promise<any> {
-  if (!auth.loggedIn || auth.type !== "mastoapi") throw new Error("Not logged in");
+  if (auth.type !== "mastoapi") throw new Error("Not logged in");
   if (!auth.token) throw new Error("Not logged in (no token)");
 
   let paramsString;

@@ -41,6 +41,7 @@ export interface MastoFeedRaw {
 }
 
 export interface MastoFollowRaw {
+  user: MastoAccount;
   following: MastoAccount[];
   followers: MastoAccount[];
   familiarFollowers: MastoFamiliarFollower[];

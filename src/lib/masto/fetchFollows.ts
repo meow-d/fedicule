@@ -3,18 +3,16 @@ import { MastoFamiliarFollower, MastoFollowRaw } from "./types";
 import { MastoAccount } from "./types";
 
 export default async function fetchFollows(): Promise<MastoFollowRaw> {
-  const mastoAccount = await getAccount();
+  const user = await getAccount();
 
-  const following = await fetchRelationships(mastoAccount.id, "following");
-  const followers = await fetchRelationships(mastoAccount.id, "followers");
+  const following = await fetchRelationships(user.id, "following");
+  const followers = await fetchRelationships(user.id, "followers");
 
   const allAccounts = following.concat(followers);
-  const uniqueAccounts = Array.from(
-    new Map(allAccounts.map((item) => [item.id, item])).values()
-  );
+  const uniqueAccounts = Array.from(new Map(allAccounts.map((item) => [item.id, item])).values());
   const familiarFollowers = await fetchFamiliarFollowers(uniqueAccounts);
 
-  return { following, followers, familiarFollowers };
+  return { user, following, followers, familiarFollowers };
 }
 
 async function fetchRelationships(

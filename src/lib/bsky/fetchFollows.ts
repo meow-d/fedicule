@@ -3,7 +3,7 @@ import { getRpc } from "./rpc";
 import type { BskyFollowRaw, BskyProfileWithFollowers } from "./types";
 
 export default async function fetchFollows(): Promise<BskyFollowRaw> {
-  if (!auth.loggedIn || auth.type !== "bsky") throw new Error("Not logged in");
+  if (auth.type !== "bsky") throw new Error("Not logged in");
 
   const following = await fetchFollowing(auth.did);
   const followers = await fetchFollowers(auth.did);

@@ -3,8 +3,7 @@ import { MastoFamiliarFollower, MastoFollowRaw } from "./types";
 import { MastoAccount } from "./types";
 
 export default async function preprocessFollows(raw: MastoFollowRaw): Promise<ProcessedData> {
-  if (!data.mastoAccount) throw new Error("User mastodon account not found");
-  const userAccount: MastoAccount = data.mastoAccount;
+  const userAccount: MastoAccount = raw.user;
   const interactions: Interaction[] = [];
 
   raw.following.forEach((account) => {

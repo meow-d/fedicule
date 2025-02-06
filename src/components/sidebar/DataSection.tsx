@@ -26,15 +26,15 @@ export default function DataSection() {
 
   const getClient = (api: "mastoapi" | "bsky") => {
     if (api === "mastoapi") {
-      client = mastoClient;
+      return mastoClient;
     } else if (api === "bsky") {
-      client = bskyClient;
+      return bskyClient;
     }
     throw new Error("Invalid API");
   };
 
   createEffect(() => {
-    if (auth.loggedIn) {
+    if (auth.type) {
       client = getClient(auth.type);
     } else {
       client = getClient(inputs.api);
@@ -99,7 +99,7 @@ export default function DataSection() {
       if (!handle || !api) {
         throw new Error("Fields are not filled in");
       }
-      if (auth.loggedIn) {
+      if (auth.type && auth.loggedIn) {
         throw new Error("Already logged in");
       }
 
@@ -170,7 +170,7 @@ export default function DataSection() {
     follows: true,
     home: false,
     api: "mastoapi",
-    handle: auth.loggedIn && auth.type === "mastoapi" ? auth.handle : "",
+    handle: auth.type === "mastoapi" ? auth.handle : "",
     postsNo: 100,
   });
 
@@ -185,7 +185,7 @@ export default function DataSection() {
           name="api"
           id="api"
           onChange={(e) => setInputs("api", e.target.value as "mastoapi" | "bsky")}
-          disabled={status.loading || auth.loggedIn}
+          disabled={status.loading || (!!auth.type && auth.loggedIn)}
         >
           <option value="mastoapi" selected>
             Mastodon
@@ -202,7 +202,7 @@ export default function DataSection() {
           id="handle"
           value={inputs.handle}
           onChange={(e) => setInputs("handle", e.target.value)}
-          disabled={status.loading || auth.loggedIn}
+          disabled={status.loading || (!!auth.type && auth.loggedIn)}
         />
       </div>
 
@@ -233,7 +233,7 @@ export default function DataSection() {
       {/* buttons */}
       <div>
         <Show
-          when={auth.loggedIn}
+          when={auth.type && auth.loggedIn}
           fallback={
             <Button disabled={status.loading} onclick={login}>
               login

@@ -8,9 +8,15 @@ export async function createApp(handle: string) {
     throw new Error("Invalid handle");
   }
 
+  setAuth({
+    type: "mastoapi",
+    loggedIn: false,
+    handle,
+    instance,
+  });
+
   const clientName = import.meta.env.VITE_CLIENT_NAME;
   const redirectUri = import.meta.env.VITE_OAUTH_MASTO_REDIRECT_URI;
-
   const response = await post("/api/v1/apps", {
     client_name: clientName,
     redirect_uris: redirectUri,
@@ -27,9 +33,6 @@ export async function createApp(handle: string) {
   const url = `https://${instance}/oauth/authorize?${new URLSearchParams(params).toString()}`;
 
   setAuth({
-    loggedIn: true,
-    type: "mastoapi",
-    instance,
     clientId: data.client_id,
     clientSecret: data.client_secret,
   });
@@ -42,7 +45,7 @@ export async function getToken(url: Location) {
   const code = urlParams.get("code");
   const redirectUri = import.meta.env.VITE_OAUTH_MASTO_REDIRECT_URI;
 
-  if (!auth.loggedIn || auth.type !== "mastoapi") {
+  if (auth.type !== "mastoapi") {
     throw new Error("Not logged in");
   }
   if (!auth.clientId || !auth.clientSecret) {
@@ -60,11 +63,11 @@ export async function getToken(url: Location) {
   });
   const data = await response.json();
 
-  setAuth({ loggedIn: true, token: data.access_token });
+  setAuth({ type: "mastoapi", loggedIn: true, token: data.access_token });
 }
 
 export async function revokeToken() {
-  if (!auth.loggedIn || auth.type !== "mastoapi") throw new Error("Not logged in");
+  if (auth.type !== "mastoapi") throw new Error("Not logged in");
 
   if (auth.token && auth.clientId && auth.clientSecret) {
     try {
@@ -76,5 +79,5 @@ export async function revokeToken() {
     } catch (error) {}
   }
 
-  setAuth("loggedIn", false);
+  setAuth("type", "");
 }
