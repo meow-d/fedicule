@@ -43,6 +43,9 @@ export function updateRenderer(
     labelColor: { color: "#888" },
     labelSize: 13,
     labelRenderedSizeThreshold: 15,
+
+    minCameraRatio: 0.1,
+    maxCameraRatio: 4,
   });
 
   // curve parellel edges
