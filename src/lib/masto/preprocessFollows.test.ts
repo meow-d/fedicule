@@ -51,16 +51,8 @@ describe("preprocessFollows", () => {
         ],
       },
     ],
+    user: mockAccount,
   };
-
-  beforeEach(() => {
-    data.mastoAccount = mockAccount;
-  });
-
-  it("should throw error if mastoAccount not found", async () => {
-    data.mastoAccount = undefined;
-    await expect(preprocessFollows(mockFollowRaw)).rejects.toThrow("User mastodon account not found");
-  });
 
   it("should process following and followers correctly", async () => {
     const result = await preprocessFollows(mockFollowRaw);
@@ -68,13 +60,13 @@ describe("preprocessFollows", () => {
     expect(result.interaction).toHaveLength(3);
     expect(result.interaction[0]).toEqual({
       sender: {
-        label: mockAccount.display_name,
+        label: mockAccount.acct,
         mastoApiId: mockAccount.id,
         display_name: mockAccount.display_name,
         image: mockAccount.avatar,
       },
       receiver: {
-        label: mockFollowRaw.following[0].display_name,
+        label: mockFollowRaw.following[0].acct,
         mastoApiId: mockFollowRaw.following[0].id,
         display_name: mockFollowRaw.following[0].display_name,
         image: mockFollowRaw.following[0].avatar,

@@ -43,13 +43,13 @@ function preprocessFamiliarFollowers(raw: MastoFollowRaw, interactions: Interact
 function addFollow(sender: MastoAccount, receiver: MastoAccount, interactions: Interaction[]) {
   interactions.push({
     sender: {
-      label: sender.display_name,
+      label: sender.acct,
       mastoApiId: sender.id,
       display_name: sender.display_name,
       image: sender.avatar,
     },
     receiver: {
-      label: receiver.display_name,
+      label: receiver.acct,
       mastoApiId: receiver.id,
       display_name: receiver.display_name,
       image: receiver.avatar,
