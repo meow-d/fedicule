@@ -245,7 +245,7 @@ export default function DataSection() {
           </Button>
 
           <Button disabled={fetchDisabled()} onClick={startFetch}>
-            {data.mastoFeedRaw ? "refetch" : "fetch"}
+            {data.processedData ? "refetch" : "fetch"}
           </Button>
         </Show>
 

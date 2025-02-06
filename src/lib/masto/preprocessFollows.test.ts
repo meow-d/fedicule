@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import preprocessFollows from "./preprocessFollows";
-import { data } from "../../stores/data";
+import { DataStore } from "../../stores/data";
 import type { MastoFollowRaw, MastoAccount } from "./types";
 
 // TODO: (or to not do) check everything
 // copilot generated...
 describe("preprocessFollows", () => {
+  const data: DataStore = {};
+
   const mockAccount: MastoAccount = {
     id: "1",
     acct: "replyguy@mastodon.social",

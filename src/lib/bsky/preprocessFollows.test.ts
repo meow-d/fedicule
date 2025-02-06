@@ -25,14 +25,14 @@ describe("preprocessFollows", () => {
     avatar: "follower.jpg",
   };
 
-  it("should process following and followers into interactions", async () => {
-    const raw: BskyFollowRaw = {
-      following: [mockFollowing],
-      followers: [mockFollower],
-      familiarFollowers: [],
-    };
+  const mockRaw: BskyFollowRaw = {
+    following: [mockFollowing],
+    followers: [mockFollower],
+    familiarFollowers: [],
+  };
 
-    const result = await preprocessFollows(raw, mockUser);
+  it("should process following and followers into interactions", async () => {
+    const result = await preprocessFollows(mockRaw, mockUser);
 
     expect(result.interaction).toHaveLength(2);
     expect(result.interaction).toContainEqual({

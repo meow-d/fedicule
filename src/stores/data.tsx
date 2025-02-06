@@ -29,4 +29,3 @@ export interface DataStore {
 }
 
 export const [data, setData] = makePersisted(createStore<DataStore>());
-
