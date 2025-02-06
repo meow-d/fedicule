@@ -10,20 +10,12 @@ import { createNodeCompoundProgram, EdgeArrowProgram } from "sigma/rendering";
 import { EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import { setState, state } from "../../stores/graph";
 
-export function updateRenderer(
-  container: HTMLElement,
-  graph: MultiDirectedGraph
-): Sigma {
+export function updateRenderer(container: HTMLElement, graph: MultiDirectedGraph): Sigma {
   // border
   const NodeBorderCustomProgram = createNodeBorderProgram({
-    borders: [
-      { size: { value: 5, mode: "pixels" }, color: { attribute: "color" } },
-    ],
+    borders: [{ size: { value: 5, mode: "pixels" }, color: { attribute: "color" } }],
   });
-  const NodeProgram = createNodeCompoundProgram([
-    NodeImageProgram,
-    NodeBorderCustomProgram,
-  ]);
+  const NodeProgram = createNodeCompoundProgram([NodeImageProgram, NodeBorderCustomProgram]);
 
   // renderer
   const renderer = new Sigma(graph, container, {
@@ -44,7 +36,7 @@ export function updateRenderer(
     labelSize: 13,
     labelRenderedSizeThreshold: 15,
 
-    minCameraRatio: 0.1,
+    minCameraRatio: 0.3,
     maxCameraRatio: 4,
   });
 
@@ -188,20 +180,14 @@ export function updateRenderer(
 
     if (
       state.hoveredNode &&
-      !graph
-        .extremities(edge)
-        .every(
-          (n) =>
-            n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode)
-        )
+      !graph.extremities(edge).every((n) => n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode))
     ) {
       res.color = "#e6e6e6";
     }
 
     if (
       state.suggestions &&
-      (!state.suggestions.has(graph.source(edge)) ||
-        !state.suggestions.has(graph.target(edge)))
+      (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge)))
     ) {
       res.color = "#e6e6e6";
     }

@@ -1,5 +1,6 @@
 import { data } from "../../stores/data";
 import { settings, setSettings, UserFilter } from "../../stores/settings";
+import { toLogScale, toLinearScale } from "../../lib/logScale";
 import Button from "../ui/Button";
 import Section from "../ui/Section";
 
@@ -7,6 +8,13 @@ export default function SettingsSection() {
   function changeFilter(e: Event) {
     if (!(e.target instanceof HTMLSelectElement)) return;
     setSettings({ userFilter: e.target.value as unknown as UserFilter });
+  }
+
+  function setZoomAmount(e: Event) {
+    if (!(e.target instanceof HTMLInputElement)) return;
+    const value = parseFloat(e.target.value);
+    const finalValue = toLogScale(value);
+    setSettings({ zoomAmount: finalValue });
   }
 
   function changeLayout(e: Event) {
@@ -26,12 +34,13 @@ export default function SettingsSection() {
       <div>
         <label for="zoom">Zoom</label>
         <input
+          style={{ direction: "rtl" }}
           type="range"
-          min="0.1"
-          max="4"
+          min={toLinearScale(0.3)}
+          max={toLinearScale(4)}
           step="any"
-          value={settings.zoomAmount}
-          onInput={(e) => setSettings("zoomAmount", parseFloat(e.target.value))}
+          value={toLinearScale(settings.zoomAmount)}
+          onInput={setZoomAmount}
         />
       </div>
 
