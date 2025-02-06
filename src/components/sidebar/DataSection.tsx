@@ -190,7 +190,7 @@ export default function DataSection() {
           <option value="mastoapi" selected>
             Mastodon
           </option>
-          <option value="bsky">Bluesky</option>
+          <option value="bsky">Bluesky (wip)</option>
         </select>
       </div>
 
