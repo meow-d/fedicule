@@ -9,10 +9,10 @@ import Sigma from "sigma";
 import { fitViewportToNodes } from "@sigma/utils";
 
 import { data as dataStore } from "../../stores/data";
-import { settings, setSettings } from "../../stores/settings";
+import { settings, setSettings, Filter } from "../../stores/settings";
 import { updateGraph } from "./updateGraph";
 import { updateRenderer } from "./updateRenderer";
-import { Coordinates } from "sigma/types";
+import { auth } from "../../stores/auth";
 
 const [graphHidden, setGraphHidden] = createSignal(false);
 let graph: MultiDirectedGraph;
@@ -51,6 +51,47 @@ function switchLayout(layoutName: "force" | "forceAtlas2", graph: MultiDirectedG
   }
 
   layout.start();
+}
+
+// user filters
+export function updateFilter(filter: Filter) {
+  if (!graph || !renderer) return;
+
+  let user;
+  if (auth.type === "mastoapi") {
+    user = auth.handle;
+  } else if (auth.type === "bsky") {
+    user = auth.did;
+  } else {
+    console.error("No auth type. Defaulting to no filters.");
+  }
+
+  if (!user || filter === Filter.None) {
+    for (const node of graph.nodes()) {
+      graph.setNodeAttribute(node, "hidden", undefined);
+    }
+    return;
+  }
+
+  for (const node of graph.nodes()) {
+    if (node === user) continue;
+
+    const followingUser = graph.findInEdge(user, node, (edge) => graph.getEdgeAttribute(edge, "follow") === true);
+    const followedByUser = graph.findOutEdge(user, node, (edge) => graph.getEdgeAttribute(edge, "follow") === true);
+
+    const nodeHidden =
+      (filter === Filter.Followers && !followingUser) ||
+      (filter === Filter.Following && !followedByUser) ||
+      (filter === Filter.Mutuals && (!followingUser || !followedByUser));
+
+    if (nodeHidden) {
+      graph.setNodeAttribute(node, "hidden", true);
+    } else {
+      graph.setNodeAttribute(node, "hidden", undefined);
+    }
+  }
+
+  renderer.refresh();
 }
 
 // main

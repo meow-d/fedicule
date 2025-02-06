@@ -23,8 +23,6 @@ export interface ProcessedData {
 }
 
 export interface DataStore {
-  mastoAccount?: MastoAccount;
-  bskyAccount?: AppBskyActorDefs.ProfileView;
   processedData?: ProcessedData;
 }
 

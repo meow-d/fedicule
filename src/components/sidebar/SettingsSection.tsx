@@ -1,10 +1,12 @@
-import { data } from "../../stores/data";
-import { settings, setSettings, UserFilter } from "../../stores/settings";
-import { toLogScale, toLinearScale } from "../../lib/logScale";
-import Section from "../ui/Section";
-import { nodes } from "../../stores/graph";
-import { focusNode } from "../graph/Graph";
 import { For } from "solid-js";
+
+import Section from "../ui/Section";
+import { update, focusNode, updateFilter } from "../graph/Graph";
+import { toLogScale, toLinearScale } from "../../lib/logScale";
+
+import { settings, setSettings, Filter } from "../../stores/settings";
+import { data } from "../../stores/data";
+import { nodes } from "../../stores/graph";
 
 export default function SettingsSection() {
   function setSearch(e: Event) {
@@ -30,7 +32,9 @@ export default function SettingsSection() {
 
   function changeFilter(e: Event) {
     if (!(e.target instanceof HTMLSelectElement)) return;
-    setSettings({ userFilter: e.target.value as unknown as UserFilter });
+    const value = parseInt(e.target.value) as unknown as Filter;
+    setSettings({ filter: value });
+    updateFilter(value);
   }
 
   function changeLayout(e: Event) {
@@ -64,11 +68,12 @@ export default function SettingsSection() {
       </div>
 
       <div>
-        <label for="filter">Filter users (wip)</label>
+        <label for="filter">Filter users</label>
         <select name="filter" id="filter" onChange={changeFilter}>
-          <option value={UserFilter.None}>None</option>
-          <option value={UserFilter.FollowersOnly}>Followers only</option>
-          <option value={UserFilter.MutualsOnly}>Mutuals only</option>
+          <option value={Filter.None}>Show all</option>
+          <option value={Filter.Followers}>Followers only</option>
+          <option value={Filter.Following}>Following only</option>
+          <option value={Filter.Mutuals}>Mutuals only</option>
         </select>
       </div>
 

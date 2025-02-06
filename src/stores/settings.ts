@@ -1,26 +1,25 @@
 import { createStore } from "solid-js/store";
 import { makePersisted } from "@solid-primitives/storage";
 
-enum UserFilter {
+export enum Filter {
   None,
-  FollowersOnly,
-  MutualsOnly,
+  Followers,
+  Following,
+  Mutuals,
 }
 
-interface Settings {
-  userFilter: UserFilter;
+export interface Settings {
+  filter: Filter;
   layout: "force" | "forceAtlas2";
   zoomAmount: number;
   search: string;
 }
 
-const [settings, setSettings] = makePersisted(
+export const [settings, setSettings] = makePersisted(
   createStore<Settings>({
-    userFilter: UserFilter.None,
+    filter: Filter.None,
     layout: "force",
     zoomAmount: 1.5,
     search: "",
   })
 );
-
-export { settings, setSettings, UserFilter };

@@ -2,7 +2,7 @@ import { MultiDirectedGraph } from "graphology";
 import louvain from "graphology-communities-louvain";
 import iwanthue from "iwanthue";
 
-import { Node, Interaction, ProcessedData } from "../../stores/data";
+import type { Node, Interaction, ProcessedData } from "../../stores/data";
 import { communities, setCommunities, setNodes } from "../../stores/graph";
 
 export function updateGraph(data: ProcessedData): MultiDirectedGraph {
@@ -40,6 +40,7 @@ export function updateGraph(data: ProcessedData): MultiDirectedGraph {
         ...attr,
         score: finalScore,
         size: size,
+        follow: attr.follow || type === "follow",
       };
     });
   }
