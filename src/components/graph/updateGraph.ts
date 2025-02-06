@@ -3,7 +3,7 @@ import louvain from "graphology-communities-louvain";
 import iwanthue from "iwanthue";
 
 import { Node, Interaction, ProcessedData } from "../../stores/data";
-import { communities, setCommunities } from "../../stores/graph";
+import { communities, setCommunities, setNodes } from "../../stores/graph";
 
 export function updateGraph(data: ProcessedData): MultiDirectedGraph {
   const graph = new MultiDirectedGraph();
@@ -75,10 +75,7 @@ export function updateGraph(data: ProcessedData): MultiDirectedGraph {
   // node size based on updated edge scores
   graph.forEachNode((node, attr) => {
     const edges = graph.edges(node);
-    const score = edges.reduce(
-      (acc, edge) => acc + graph.getEdgeAttribute(edge, "score"),
-      0
-    );
+    const score = edges.reduce((acc, edge) => acc + graph.getEdgeAttribute(edge, "score"), 0);
     const size = 5 + Math.log(score) * 3;
     graph.setNodeAttribute(node, "size", size);
   });
@@ -104,21 +101,15 @@ export function updateGraph(data: ProcessedData): MultiDirectedGraph {
     }),
     {}
   );
-  graph.forEachNode((node, attr) =>
-    graph.setNodeAttribute(node, "color", palette[attr.community])
-  );
+  graph.forEachNode((node, attr) => graph.setNodeAttribute(node, "color", palette[attr.community]));
 
   // find largest node in each community
   const updatedCommunities = communities().map((community) => {
-    const nodesInCommunity = graph.filterNodes(
-      (node, attrs) => attrs.community === community.id
-    );
+    const nodesInCommunity = graph.filterNodes((node, attrs) => attrs.community === community.id);
 
     if (nodesInCommunity.length > 0) {
       const largestNode = nodesInCommunity.reduce((a, b) =>
-        graph.getNodeAttribute(a, "size") > graph.getNodeAttribute(b, "size")
-          ? a
-          : b
+        graph.getNodeAttribute(a, "size") > graph.getNodeAttribute(b, "size") ? a : b
       );
       return {
         ...community,
@@ -129,6 +120,9 @@ export function updateGraph(data: ProcessedData): MultiDirectedGraph {
     return community;
   });
   setCommunities(updatedCommunities);
+
+  // update list of nodes, for search suggestions
+  setNodes(graph.nodes().map((n) => ({ id: n, label: graph.getNodeAttribute(n, "label") as string })));
 
   return graph;
 }

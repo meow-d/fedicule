@@ -12,19 +12,26 @@ import { data as dataStore } from "../../stores/data";
 import { settings, setSettings } from "../../stores/settings";
 import { updateGraph } from "./updateGraph";
 import { updateRenderer } from "./updateRenderer";
+import { Coordinates } from "sigma/types";
 
 const [graphHidden, setGraphHidden] = createSignal(false);
 let graph: MultiDirectedGraph;
 let renderer: Sigma;
 let container;
 
-// fitViewportToCommunity
+// node navigation
 /** camera zooms in/out to fit all nodes from a community in viewport */
 export function fitViewportToCommunity(community: string) {
   if (!renderer) return;
   if (!graph) return;
   const nodes = graph.filterNodes((_, attr) => attr.community === community);
   fitViewportToNodes(renderer, nodes);
+}
+
+export function focusNode(node: string) {
+  if (!renderer) return;
+  if (!graph) return;
+  fitViewportToNodes(renderer, [node]);
 }
 
 // layouts

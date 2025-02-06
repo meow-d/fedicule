@@ -28,3 +28,10 @@ export interface community {
 }
 
 export const [communities, setCommunities] = createSignal<community[]>([]);
+
+interface nodes {
+  id: string;
+  label: string;
+}
+
+export const [nodes, setNodes] = createSignal<nodes[]>();

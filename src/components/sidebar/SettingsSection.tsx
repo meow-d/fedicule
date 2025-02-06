@@ -1,13 +1,24 @@
 import { data } from "../../stores/data";
 import { settings, setSettings, UserFilter } from "../../stores/settings";
 import { toLogScale, toLinearScale } from "../../lib/logScale";
-import Button from "../ui/Button";
 import Section from "../ui/Section";
+import { nodes } from "../../stores/graph";
+import { focusNode } from "../graph/Graph";
+import { For } from "solid-js";
 
 export default function SettingsSection() {
-  function changeFilter(e: Event) {
-    if (!(e.target instanceof HTMLSelectElement)) return;
-    setSettings({ userFilter: e.target.value as unknown as UserFilter });
+  function setSearch(e: Event) {
+    if (!(e.target instanceof HTMLInputElement)) return;
+    const query = e.target.value;
+    setSettings("search", query);
+    if (!query) return;
+
+    const nodeList = nodes();
+    if (!nodeList) return;
+
+    const matches = nodeList.filter(({ label }) => label.toLowerCase().includes(query.toLowerCase()));
+    const exactMatch = matches.length === 1 && matches[0].label === query;
+    if (exactMatch) focusNode(matches[0].id);
   }
 
   function setZoomAmount(e: Event) {
@@ -15,6 +26,11 @@ export default function SettingsSection() {
     const value = parseFloat(e.target.value);
     const finalValue = toLogScale(value);
     setSettings({ zoomAmount: finalValue });
+  }
+
+  function changeFilter(e: Event) {
+    if (!(e.target instanceof HTMLSelectElement)) return;
+    setSettings({ userFilter: e.target.value as unknown as UserFilter });
   }
 
   function changeLayout(e: Event) {
@@ -28,7 +44,10 @@ export default function SettingsSection() {
     <Section title="Settings" open={!!data.processedData}>
       <div>
         <label for="search">Search (wip)</label>
-        <input type="text" onInput={(e) => setSettings("search", e.target.value)} />
+        <input type="text" id="search" list="suggestions" onInput={setSearch} />
+        <datalist id="suggestions">
+          <For each={nodes()}>{(node) => <option value={node.label} />}</For>
+        </datalist>
       </div>
 
       <div>
