@@ -44,7 +44,7 @@ export default function SettingsSection() {
     <Section title="Settings" open={!!data.processedData}>
       <div>
         <label for="search">Search (wip)</label>
-        <input type="text" id="search" list="suggestions" onInput={setSearch} />
+        <input type="text" id="search" list="suggestions" onInput={setSearch} enterkeyhint="go" />
         <datalist id="suggestions">
           <For each={nodes()}>{(node) => <option value={node.label} />}</For>
         </datalist>
