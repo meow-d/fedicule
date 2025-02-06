@@ -13,16 +13,17 @@ import { settings, setSettings } from "../../stores/settings";
 import { updateGraph } from "./updateGraph";
 import { updateRenderer } from "./updateRenderer";
 
-const [graph, setGraph] = createSignal<MultiDirectedGraph>();
+const [graphHidden, setGraphHidden] = createSignal(false);
+let graph: MultiDirectedGraph;
 let renderer: Sigma;
 let container;
 
 // fitViewportToCommunity
 /** camera zooms in/out to fit all nodes from a community in viewport */
 export function fitViewportToCommunity(community: string) {
-  const currentGraph = graph();
-  if (!renderer || !currentGraph) return;
-  const nodes = currentGraph.filterNodes((_, attr) => attr.community === community);
+  if (!renderer) return;
+  if (!graph) return;
+  const nodes = graph.filterNodes((_, attr) => attr.community === community);
   fitViewportToNodes(renderer, nodes);
 }
 
@@ -49,27 +50,29 @@ function switchLayout(layoutName: "force" | "forceAtlas2", graph: MultiDirectedG
 /** (re)creates the graph and renderer */
 export function update() {
   if (!dataStore.processedData) return;
-  setGraph(updateGraph(dataStore.processedData));
-  const currentGraph = graph();
-  if (!currentGraph) return;
-  switchLayout(settings.layout, currentGraph);
+  graph = updateGraph(dataStore.processedData);
+  setGraphHidden(!graph);
+  if (!graph) return;
+
+  switchLayout(settings.layout, graph);
 
   if (renderer) renderer.kill();
   if (!container) return;
-  renderer = updateRenderer(container, currentGraph);
+  renderer = updateRenderer(container, graph);
   renderer.getCamera().addListener("updated", (e) => setSettings("zoomAmount", e.ratio));
 }
 
 export function Graph() {
   createEffect(() => {
-    const currentGraph = graph();
-    if (!currentGraph) return;
-    switchLayout(settings.layout, currentGraph);
+    const layout = settings.layout;
+    if (!graph) return;
+    switchLayout(layout, graph);
   });
 
   createEffect(() => {
+    const zoomAmount = settings.zoomAmount;
     if (!renderer) return;
-    renderer.getCamera().animatedZoom(settings.zoomAmount);
+    renderer.getCamera().ratio = zoomAmount;
   });
 
   onMount(update);
@@ -87,7 +90,7 @@ export function Graph() {
       }}
       ref={container}
     >
-      <Show when={!graph()}>
+      <Show when={graphHidden()}>
         <p>no graph data... go fetch some posts!</p>
       </Show>
     </div>

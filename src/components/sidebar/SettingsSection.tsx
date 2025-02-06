@@ -29,7 +29,7 @@ export default function SettingsSection() {
           type="range"
           min="0.1"
           max="4"
-          step="0.1"
+          step="any"
           value={settings.zoomAmount}
           onInput={(e) => setSettings("zoomAmount", parseFloat(e.target.value))}
         />
