@@ -10,7 +10,7 @@ import Checkbox from "../ui/Checkbox";
 import Message from "../ui/Message";
 import Button from "../ui/Button";
 
-import { auth } from "../../stores/authStore";
+import { auth } from "../../stores/auth";
 import { data, setData } from "../../stores/data";
 import { Client } from "../../lib/Client";
 import { BskyClient } from "../../lib/bsky/client";

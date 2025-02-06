@@ -1,4 +1,4 @@
-import { get, getNextPageUrl } from "./mastoApi";
+import { get, getNextPageUrl } from "./mastoapi";
 import { MastoFamiliarFollower, MastoFollowRaw } from "./types";
 import { MastoAccount } from "./types";
 
@@ -15,10 +15,7 @@ export default async function fetchFollows(): Promise<MastoFollowRaw> {
   return { user, following, followers, familiarFollowers };
 }
 
-async function fetchRelationships(
-  id: string,
-  type: "following" | "followers"
-): Promise<MastoAccount[]> {
+async function fetchRelationships(id: string, type: "following" | "followers"): Promise<MastoAccount[]> {
   let url: string | null = `/api/v1/accounts/${id}/${type}`;
   let accounts: MastoAccount[] = [];
 
@@ -32,18 +29,13 @@ async function fetchRelationships(
   return accounts;
 }
 
-async function fetchFamiliarFollowers(
-  accounts: MastoAccount[]
-): Promise<MastoFamiliarFollower[]> {
+async function fetchFamiliarFollowers(accounts: MastoAccount[]): Promise<MastoFamiliarFollower[]> {
   const params = new URLSearchParams();
   accounts.forEach((account) => {
     params.append("id[]", account.id);
   });
 
-  const response = await get(
-    "/api/v1/accounts/familiar_followers",
-    params.toString()
-  );
+  const response = await get("/api/v1/accounts/familiar_followers", params.toString());
   return await response.json();
 }
 

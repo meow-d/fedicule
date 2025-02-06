@@ -1,5 +1,5 @@
 import { XRPC } from "@atcute/client";
-import { auth } from "../../stores/authStore";
+import { auth } from "../../stores/auth";
 import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 
 let rpc: XRPC;

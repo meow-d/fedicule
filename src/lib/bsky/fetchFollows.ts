@@ -1,4 +1,4 @@
-import { auth } from "../../stores/authStore";
+import { auth } from "../../stores/auth";
 import { getRpc } from "./rpc";
 import type { BskyFollowRaw, BskyProfileWithFollowers } from "./types";
 

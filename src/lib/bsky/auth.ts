@@ -7,7 +7,7 @@ import {
   getSession,
   deleteStoredSession,
 } from "@atcute/oauth-browser-client";
-import { auth, setAuth } from "../../stores/authStore";
+import { auth, setAuth } from "../../stores/auth";
 import { createRpc as updateRpc } from "./rpc";
 
 export async function createAuthUrl(handle: string): Promise<string | URL> {

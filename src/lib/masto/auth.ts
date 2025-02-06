@@ -1,5 +1,5 @@
-import { post, postParams } from "./mastoApi";
-import { auth, setAuth, type Auth } from "../../stores/authStore";
+import { post, postParams } from "./mastoapi";
+import { auth, setAuth, type Auth } from "../../stores/auth";
 
 export async function createApp(handle: string) {
   // TODO: yeah why tf did you ask them for the full handle

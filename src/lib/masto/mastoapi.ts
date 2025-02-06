@@ -1,4 +1,4 @@
-import { auth } from "../../stores/authStore";
+import { auth } from "../../stores/auth";
 
 export async function post(endpoint: string, body?: Record<string, string>): Promise<any> {
   if (auth.type !== "mastoapi") throw new Error("Not logged in");

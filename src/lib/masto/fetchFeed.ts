@@ -1,16 +1,13 @@
-import { get, getNextPageUrl } from "./mastoApi";
+import { get, getNextPageUrl } from "./mastoapi";
 import { MastoFeedRaw, MastoPost, MastoLikesOrBoost } from "./types";
 
-export default async function fetchFeed(
-  numberOfPosts: number
-): Promise<MastoFeedRaw> {
+export default async function fetchFeed(numberOfPosts: number): Promise<MastoFeedRaw> {
   let posts;
   posts = await fetchPosts(numberOfPosts);
   posts = filterBoosts(posts);
   posts = filterUniquePosts(posts);
 
-  if (!posts || posts.length === 0)
-    throw new Error("No posts on home timeline!");
+  if (!posts || posts.length === 0) throw new Error("No posts on home timeline!");
 
   const replies = await fetchReplies(posts);
   posts = posts.concat(replies);
@@ -119,11 +116,7 @@ async function fetchInteractions(
 }
 
 function filterUniquePosts(posts: any[]): any[] {
-  return [
-    ...new Map(
-      posts.filter((post) => post).map((post) => [post.id, post])
-    ).values(),
-  ];
+  return [...new Map(posts.filter((post) => post).map((post) => [post.id, post])).values()];
 }
 
 // unused due to the Amber Puppygirlhornypost problem™️
