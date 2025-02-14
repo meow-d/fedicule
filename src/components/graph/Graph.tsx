@@ -61,7 +61,8 @@ export function updateFilter(filter: Filter) {
   if (auth.type === "mastoapi") {
     user = auth.handle;
   } else if (auth.type === "bsky") {
-    user = auth.did;
+    // TODO: this can be a did or a handle
+    user = auth.handle;
   } else {
     console.error("No auth type. Defaulting to no filters.");
   }
