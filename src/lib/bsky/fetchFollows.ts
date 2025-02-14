@@ -1,6 +1,13 @@
+import type { XRPCResponse } from "@atcute/client";
+import type {
+  AppBskyActorDefs,
+  AppBskyGraphGetFollowers,
+  AppBskyGraphGetFollows,
+  AppBskyGraphGetKnownFollowers,
+} from "@atcute/client/lexicons";
+import type { BskyFollowRaw, BskyProfileWithFollowers } from "./types";
 import { auth } from "../../stores/auth";
 import { getRpc } from "./rpc";
-import type { BskyFollowRaw, BskyProfileWithFollowers } from "./types";
 
 export default async function fetchFollows(): Promise<BskyFollowRaw> {
   if (auth.type !== "bsky") throw new Error("Not logged in");
@@ -18,26 +25,39 @@ export default async function fetchFollows(): Promise<BskyFollowRaw> {
   return { following, followers, familiarFollowers: combinedArray };
 }
 
-async function fetchFollowing(did: string) {
-  const rpc = await getRpc();
-  const data = await rpc.get("app.bsky.graph.getFollows", {
-    params: { actor: did },
-  });
-  return data.data.follows;
+async function fetchFollowing(did: `did:${string}`) {
+  return paginate("app.bsky.graph.getFollows", did);
 }
 
-async function fetchFollowers(did: string) {
-  const rpc = await getRpc();
-  const data = await rpc.get("app.bsky.graph.getFollowers", {
-    params: { actor: did },
-  });
-  return data.data.followers;
+async function fetchFollowers(did: `did:${string}`) {
+  return paginate("app.bsky.graph.getFollowers", did);
 }
 
-async function fetchKnownFollowers(did: string) {
+async function fetchKnownFollowers(did: `did:${string}`) {
+  return paginate("app.bsky.graph.getKnownFollowers", did);
+}
+
+type Endpoint = "app.bsky.graph.getFollows" | "app.bsky.graph.getFollowers" | "app.bsky.graph.getKnownFollowers";
+type Response = XRPCResponse<
+  AppBskyGraphGetFollows.Output | AppBskyGraphGetFollowers.Output | AppBskyGraphGetKnownFollowers.Output
+>;
+
+async function paginate(endpoint: Endpoint, did: `did:${string}`) {
   const rpc = await getRpc();
-  const data = await rpc.get("app.bsky.graph.getKnownFollowers", {
-    params: { actor: did },
-  });
-  return data.data.followers;
+  let data: AppBskyActorDefs.ProfileView[] = [];
+  let cursor: string | undefined = undefined;
+
+  do {
+    const response: Response = await rpc.get(endpoint, {
+      params: { actor: did, limit: 100, cursor },
+    });
+    if ("follows" in response.data) {
+      data = data.concat(response.data.follows);
+    } else if ("followers" in response.data) {
+      data = data.concat(response.data.followers);
+    }
+    cursor = response.data.cursor;
+  } while (cursor);
+
+  return data;
 }

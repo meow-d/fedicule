@@ -18,6 +18,7 @@ type MastoAuth = {
 type BskyAuth = {
   type: "bsky";
   loggedIn: boolean;
+  handle: string;
   did: `did:${string}`;
 };
 

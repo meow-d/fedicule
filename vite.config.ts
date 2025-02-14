@@ -29,7 +29,8 @@ const oauthPlugin: Plugin = {
       process.env.VITE_OAUTH_CLIENT_ID = clientId;
       process.env.VITE_OAUTH_REDIRECT_URI = redirectUri;
 
-      const redirectUriMasto = `http://${SERVER_HOST}:${SERVER_PORT}/?oauth=mastoapi`;
+      // TODO: hardcoded for now
+      const redirectUriMasto = `http://${SERVER_HOST}:${SERVER_PORT}/callback/mastoapi`;
       process.env.VITE_OAUTH_MASTO_REDIRECT_URI = redirectUriMasto;
     }
 

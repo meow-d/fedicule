@@ -13,6 +13,6 @@ export async function createRpc() {
 }
 
 export async function getRpc(): Promise<XRPC> {
-  if (!rpc) createRpc();
+  if (!rpc) await createRpc();
   return rpc;
 }

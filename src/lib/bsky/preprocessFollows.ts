@@ -1,6 +1,6 @@
 import type { AppBskyActorDefs } from "@atcute/client/lexicons";
 import type { Interaction, ProcessedData } from "../../stores/data";
-import type { BskyFollowRaw } from "./types";
+import type { BskyFollowRaw, BskyProfileWithFollowers } from "./types";
 
 export default async function preprocessFollows(
   raw: BskyFollowRaw,
@@ -16,28 +16,15 @@ export default async function preprocessFollows(
     addFollow(account, user, interactions);
   });
 
-  preprocessFamiliarFollowers(raw);
+  preprocessFamiliarFollowers(raw.familiarFollowers, interactions);
 
   return { interaction: interactions };
 }
 
-function preprocessFamiliarFollowers(raw: BskyFollowRaw) {
-  const familiarFollowers = raw.familiarFollowers;
-  const following = raw.following;
-  const followers = raw.followers;
-
-  familiarFollowers.forEach((familiarFollower) => {
-    const receiver =
-      following.find((account) => account.did === familiarFollower.did) ||
-      followers.find((account) => account.did === familiarFollower.did);
-
-    if (!receiver) {
-      console.error("Account not found!!!", familiarFollower.did);
-      return;
-    }
-
-    familiarFollower.knownFollowers?.forEach((account) => {
-      addFollow(account, receiver, []);
+function preprocessFamiliarFollowers(familiarFollowers: BskyProfileWithFollowers[], interactions: Interaction[]) {
+  familiarFollowers.forEach((receiver) => {
+    receiver.knownFollowers?.forEach((account) => {
+      addFollow(account, receiver, interactions);
     });
   });
 }

@@ -10,7 +10,7 @@ import Checkbox from "../ui/Checkbox";
 import Message from "../ui/Message";
 import Button from "../ui/Button";
 
-import { auth } from "../../stores/auth";
+import { auth, setAuth } from "../../stores/auth";
 import { data, setData } from "../../stores/data";
 import { Client } from "../../lib/Client";
 import { BskyClient } from "../../lib/bsky/client";
@@ -43,7 +43,6 @@ export default function DataSection() {
 
   // fetch
   const startFetch = async () => {
-    const api = inputs.api;
     const handle = inputs.handle;
     const follows = inputs.follows;
     const home = inputs.home;
@@ -114,11 +113,12 @@ export default function DataSection() {
   };
 
   onMount(async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const api = urlParams.get("oauth");
-    if (!api) return;
-    if (api !== "mastoapi" && api !== "bsky") {
-      setStatus({ message: "Invalid API", error: true, loading: false });
+    // TODO change to pathname
+    if (window.location.pathname === "/callback/mastoapi") {
+      client = getClient("mastoapi");
+    } else if (window.location.pathname === "/callback/bsky") {
+      client = getClient("bsky");
+    } else {
       return;
     }
 
@@ -169,8 +169,8 @@ export default function DataSection() {
   const [inputs, setInputs] = createStore<Inputs>({
     follows: true,
     home: false,
-    api: "mastoapi",
-    handle: auth.type === "mastoapi" ? auth.handle : "",
+    api: auth.type === "" ? "mastoapi" : auth.type,
+    handle: auth.type === "" ? "" : auth.handle,
     postsNo: 100,
   });
 
@@ -187,10 +187,12 @@ export default function DataSection() {
           onChange={(e) => setInputs("api", e.target.value as "mastoapi" | "bsky")}
           disabled={status.loading || (!!auth.type && auth.loggedIn)}
         >
-          <option value="mastoapi" selected>
+          <option value="mastoapi" selected={inputs.api === "mastoapi"}>
             Mastodon
           </option>
-          <option value="bsky">Bluesky (wip)</option>
+          <option value="bsky" selected={inputs.api === "bsky"}>
+            Bluesky (wip)
+          </option>
         </select>
       </div>
 

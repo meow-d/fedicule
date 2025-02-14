@@ -3,7 +3,7 @@
   "client_name": "fedicule",
   "client_uri": "https://fedicule.pages.dev",
   "grant_types": ["authorization_code", "refresh_token"],
-  "redirect_uris": ["https://fedicule.pages.dev/?oauth=mastoapi"],
+  "redirect_uris": ["https://fedicule.pages.dev/callback/mastoapi"],
   "response_types": ["code"],
   "scope": "read"
 }

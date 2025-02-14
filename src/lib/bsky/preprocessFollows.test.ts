@@ -1,73 +1,68 @@
 import { describe, it, expect } from "vitest";
 import preprocessFollows from "./preprocessFollows";
-import type { BskyFollowRaw } from "./types";
+import type { BskyFollowRaw, BskyProfileWithFollowers } from "./types";
 import type { AppBskyActorDefs } from "@atcute/client/lexicons";
 
 describe("preprocessFollows", () => {
-  const mockUser: AppBskyActorDefs.ProfileView = {
-    did: "did:plc:user123",
-    handle: "user123",
-    displayName: "Test User",
-    avatar: "avatar.jpg",
-  };
+  const createMockUser = (
+    did: `did:${string}`,
+    handle: string,
+    displayName: string,
+    avatar: string
+  ): AppBskyActorDefs.ProfileView => ({
+    did,
+    handle,
+    displayName,
+    avatar,
+  });
 
-  const mockFollowing: AppBskyActorDefs.ProfileView = {
-    did: "did:plc:following123",
-    handle: "following123",
-    displayName: "Following User",
-    avatar: "following.jpg",
-  };
+  const createFamiliarFollow = (
+    user: AppBskyActorDefs.ProfileView,
+    followers: AppBskyActorDefs.ProfileView[]
+  ): BskyProfileWithFollowers => ({
+    ...user,
+    knownFollowers: followers,
+  });
 
-  const mockFollower: AppBskyActorDefs.ProfileView = {
-    did: "did:plc:follower123",
-    handle: "follower123",
-    displayName: "Follower User",
-    avatar: "follower.jpg",
-  };
-
-  const mockRaw: BskyFollowRaw = {
-    following: [mockFollowing],
-    followers: [mockFollower],
-    familiarFollowers: [],
-  };
+  const createExpectedInteraction = (sender: AppBskyActorDefs.ProfileView, receiver: AppBskyActorDefs.ProfileView) => ({
+    sender: {
+      label: sender.handle,
+      bskyDid: sender.did,
+      display_name: sender.displayName,
+      image: sender.avatar,
+    },
+    receiver: {
+      label: receiver.handle,
+      bskyDid: receiver.did,
+      display_name: receiver.displayName,
+      image: receiver.avatar,
+    },
+    type: "follow",
+  });
 
   it("should process following and followers into interactions", async () => {
-    const result = await preprocessFollows(mockRaw, mockUser);
+    const mockUser = createMockUser("did:plc:user123", "user123", "Test User", "avatar.jpg");
+    const mockUserA = createMockUser("did:plc:following123", "following123", "Following User", "following.jpg");
+    const mockUserB = createMockUser("did:plc:follower123", "follower123", "Follower User", "follower.jpg");
+    const mockUserAFamiliar = createFamiliarFollow(mockUserA, [mockUserB]);
+    const mockUserBFamiliar = createFamiliarFollow(mockUserB, [mockUserA]);
+    const raw: BskyFollowRaw = {
+      following: [mockUserA],
+      followers: [mockUserB],
+      familiarFollowers: [mockUserAFamiliar, mockUserBFamiliar],
+    };
 
-    expect(result.interaction).toHaveLength(2);
-    expect(result.interaction).toContainEqual({
-      sender: {
-        label: mockUser.handle,
-        bskyDid: mockUser.did,
-        display_name: mockUser.displayName,
-        image: mockUser.avatar,
-      },
-      receiver: {
-        label: mockFollowing.handle,
-        bskyDid: mockFollowing.did,
-        display_name: mockFollowing.displayName,
-        image: mockFollowing.avatar,
-      },
-      type: "follow",
-    });
-    expect(result.interaction).toContainEqual({
-      sender: {
-        label: mockFollower.handle,
-        bskyDid: mockFollower.did,
-        display_name: mockFollower.displayName,
-        image: mockFollower.avatar,
-      },
-      receiver: {
-        label: mockUser.handle,
-        bskyDid: mockUser.did,
-        display_name: mockUser.displayName,
-        image: mockUser.avatar,
-      },
-      type: "follow",
-    });
+    const result = await preprocessFollows(raw, mockUser);
+
+    expect(result.interaction).toHaveLength(4);
+    expect(result.interaction).toContainEqual(createExpectedInteraction(mockUser, mockUserA));
+    expect(result.interaction).toContainEqual(createExpectedInteraction(mockUserB, mockUser));
+    expect(result.interaction).toContainEqual(createExpectedInteraction(mockUserA, mockUserB));
+    expect(result.interaction).toContainEqual(createExpectedInteraction(mockUserB, mockUserA));
   });
 
   it("should handle empty following and followers", async () => {
+    const mockUser = createMockUser("did:plc:user123", "user123", "Test User", "avatar.jpg");
     const raw: BskyFollowRaw = {
       following: [],
       followers: [],

@@ -10,14 +10,14 @@ import {
 import { auth, setAuth } from "../../stores/auth";
 import { createRpc as updateRpc } from "./rpc";
 
-export async function createAuthUrl(handle: string): Promise<string | URL> {
-  configureOAuth({
-    metadata: {
-      client_id: import.meta.env.VITE_OAUTH_CLIENT_ID,
-      redirect_uri: import.meta.env.VITE_OAUTH_REDIRECT_URI,
-    },
-  });
+configureOAuth({
+  metadata: {
+    client_id: import.meta.env.VITE_OAUTH_CLIENT_ID,
+    redirect_uri: import.meta.env.VITE_OAUTH_REDIRECT_URI,
+  },
+});
 
+export async function createAuthUrl(handle: string): Promise<string | URL> {
   const { identity, metadata } = await resolveFromIdentity(handle);
 
   const authUrl = await createAuthorizationUrl({
@@ -31,6 +31,7 @@ export async function createAuthUrl(handle: string): Promise<string | URL> {
   setAuth({
     type: "bsky",
     loggedIn: false,
+    handle,
     did: identity.id,
   });
 
