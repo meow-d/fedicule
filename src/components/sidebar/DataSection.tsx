@@ -174,7 +174,7 @@ export default function DataSection() {
     postsNo: 100,
   });
 
-  const fetchDisabled = createMemo(() => !inputs.follows && !inputs.home && !status.loading);
+  const fetchDisabled = createMemo(() => (!inputs.follows && !inputs.home) || status.loading);
 
   return (
     <Section title="Data" open={!data.processedData || (auth.type !== "" && !auth.loggedIn)}>
@@ -248,6 +248,14 @@ export default function DataSection() {
 
           <Button disabled={fetchDisabled()} onClick={startFetch}>
             {data.processedData ? "refetch" : "fetch"}
+          </Button>
+
+          <Button
+            onClick={() => {
+              setAuth({ handle: "xn--i2raaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.pages.dev" });
+            }}
+          >
+            a
           </Button>
         </Show>
 
