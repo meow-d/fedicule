@@ -35,7 +35,7 @@ export function updateGraph(data: ProcessedData): MultiDirectedGraph {
     graph.updateEdge(sender.label, receiver.label, (attr) => {
       const finalScore = (attr.score || 0) + score * 1;
       // const size = score;
-      const size = Math.log(score) * 2;
+      const size = Math.log(score);
       return {
         ...attr,
         score: finalScore,
@@ -77,7 +77,7 @@ export function updateGraph(data: ProcessedData): MultiDirectedGraph {
   graph.forEachNode((node, attr) => {
     const edges = graph.edges(node);
     const score = edges.reduce((acc, edge) => acc + graph.getEdgeAttribute(edge, "score"), 0);
-    const size = 5 + Math.log(score) * 3;
+    const size = 5 + Math.log(score) * 2;
     graph.setNodeAttribute(node, "size", size);
   });
 
