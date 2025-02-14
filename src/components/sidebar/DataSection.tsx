@@ -177,7 +177,7 @@ export default function DataSection() {
   const fetchDisabled = createMemo(() => !inputs.follows && !inputs.home && !status.loading);
 
   return (
-    <Section title="Data" open={!data.processedData}>
+    <Section title="Data" open={!data.processedData || (auth.type !== "" && !auth.loggedIn)}>
       {/* inputs */}
       <div>
         <label for="api">API</label>
