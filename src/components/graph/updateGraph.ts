@@ -82,7 +82,12 @@ export function updateGraph(data: ProcessedData): MultiDirectedGraph {
   });
 
   // community detection using louvain
-  louvain.assign(graph, { nodeCommunityAttribute: "community" });
+  louvain.assign(graph, {
+    nodeCommunityAttribute: "community",
+    getEdgeWeight: "score",
+    randomWalk: false,
+    resolution: 1.5,
+  });
 
   const communitiesSet = new Set<string>();
   graph.forEachNode((_, attrs) => communitiesSet.add(attrs.community));
