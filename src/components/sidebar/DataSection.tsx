@@ -212,11 +212,15 @@ export default function DataSection() {
 
       <div>
         <label>Sources</label>
-        <Checkbox
-          name="follows"
-          onChange={(e) => setInputs("follows", e.target.checked)}
-          checked={inputs.follows}
-        ></Checkbox>
+        <span>
+          <Checkbox
+            name="follows"
+            onChange={(e) => setInputs("follows", e.target.checked)}
+            checked={inputs.follows}
+            tooltip={"does not work with sharkey/akkoma's mastoapi"}
+            showTooltip={auth.type === "mastoapi"}
+          ></Checkbox>
+        </span>
         <Checkbox name="home" displayName="home feed" onChange={(e) => setInputs("home", e.target.checked)}></Checkbox>
       </div>
 
