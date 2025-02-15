@@ -35,15 +35,16 @@ export function focusNode(node: string) {
 }
 
 // layouts
-let layout: ForceSupervisor | FA2Layout;
+let layout: ForceSupervisor | FA2Layout | undefined;
 
 /** destorys the pervious layout worker and starts a new one. */
 function switchLayout(layoutName: "force" | "forceAtlas2", graph: MultiDirectedGraph) {
-  // also a workaround because setState kept triggering createEffect for some reason
-  const currentLayout = layout instanceof ForceSupervisor ? "force" : "forceAtlas2";
-  if (currentLayout === layoutName) return;
-
-  if (layout) layout.stop();
+  if (layout) {
+    // also a workaround because setState kept triggering createEffect for some reason
+    const currentLayout = layout instanceof ForceSupervisor ? "force" : "forceAtlas2";
+    if (currentLayout === layoutName) return;
+    layout.stop();
+  }
 
   if (layoutName === "force") {
     layout = new ForceSupervisor(graph, {
@@ -54,6 +55,8 @@ function switchLayout(layoutName: "force" | "forceAtlas2", graph: MultiDirectedG
   } else if (layoutName === "forceAtlas2") {
     const fa2settings = forceAtlas2.inferSettings(graph);
     layout = new FA2Layout(graph, { settings: { ...fa2settings } });
+  } else {
+    throw new Error("Invalid layout");
   }
 
   layout.start();
