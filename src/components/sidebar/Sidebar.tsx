@@ -18,7 +18,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside class={collapsed() ? styles.collasped : ""}>
+    <aside class={collapsed() ? styles.collapsed : ""}>
       <button id={styles.collapseButton} onClick={toggleCollapsed}>
         &gt;&gt;
       </button>
