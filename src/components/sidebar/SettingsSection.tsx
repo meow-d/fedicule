@@ -23,6 +23,12 @@ export default function SettingsSection() {
     if (exactMatch) focusNode(matches[0].id);
   }
 
+  function searchEnter(e: KeyboardEvent) {
+    if (e.key === "Enter") {
+      setSearch(e);
+    }
+  }
+
   function setZoomAmount(e: Event) {
     if (!(e.target instanceof HTMLInputElement)) return;
     const value = parseFloat(e.target.value);
@@ -47,8 +53,15 @@ export default function SettingsSection() {
   return (
     <Section title="Settings" open={!!data.processedData}>
       <div>
-        <label for="search">Search (wip)</label>
-        <input type="text" id="search" list="suggestions" onInput={setSearch} enterkeyhint="go" />
+        <label for="search">Search</label>
+        <input
+          type="text"
+          id="search"
+          list="suggestions"
+          onInput={setSearch}
+          onKeyDown={searchEnter}
+          enterkeyhint="go"
+        />
         <datalist id="suggestions">
           <For each={nodes()}>{(node) => <option value={node.label} />}</For>
         </datalist>
