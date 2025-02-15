@@ -103,10 +103,12 @@ export default function DataSection() {
       }
 
       if (!client) throw new Error("Client not found...?");
+      setStatus({ message: "Creatng auth url...", error: false, loading: true });
       const url = await client.createAuthUrl(handle);
 
       await new Promise((r) => setTimeout(r, 200));
       window.location.assign(url);
+      setStatus({ message: "Failed to create auth url...?", error: true, loading: false });
     } catch (error: any) {
       console.error(error);
     }
