@@ -54,6 +54,8 @@ function switchLayout(layoutName: "force" | "forceAtlas2", graph: MultiDirectedG
     });
   } else if (layoutName === "forceAtlas2") {
     const fa2settings = forceAtlas2.inferSettings(graph);
+    // adjustSizes takes node sizes in account, but it makes the graph move awkwardly
+    // i mean i could probably only enable it after a few seconds or something
     layout = new FA2Layout(graph, { settings: { ...fa2settings } });
   } else {
     throw new Error("Invalid layout");
