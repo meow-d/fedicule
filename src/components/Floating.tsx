@@ -32,20 +32,22 @@ export default function Floating() {
       </Section>
 
       <Section title="Polycules" open={true} class={styles.floating}>
-        <For each={communities()}>
-          {(community) => (
-            <Button background="#813975" style={{ width: "100%" }}>
-              <div
-                class={styles.community}
-                style={{ color: community.color }}
-                onClick={() => fitViewportToCommunity(community.id)}
-              >
-                <span>{community.id}</span>
-                <span>{community.largestNode}</span>
-              </div>
-            </Button>
-          )}
-        </For>
+        <div>
+          <For each={communities()}>
+            {(community) => (
+              <Button background="#813975" style={{ width: "100%" }}>
+                <div
+                  class={styles.community}
+                  style={{ color: community.color }}
+                  onClick={() => fitViewportToCommunity(community.id)}
+                >
+                  <span>{community.id}</span>
+                  <span>{community.largestNode}</span>
+                </div>
+              </Button>
+            )}
+          </For>
+        </div>
       </Section>
     </aside>
   );
