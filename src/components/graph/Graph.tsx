@@ -39,11 +39,17 @@ let layout: ForceSupervisor | FA2Layout;
 
 /** destorys the pervious layout worker and starts a new one. */
 function switchLayout(layoutName: "force" | "forceAtlas2", graph: MultiDirectedGraph) {
+  // also a workaround because setState kept triggering createEffect for some reason
+  const currentLayout = layout instanceof ForceSupervisor ? "force" : "forceAtlas2";
+  if (currentLayout === layoutName) return;
+
   if (layout) layout.stop();
 
   if (layoutName === "force") {
     layout = new ForceSupervisor(graph, {
-      isNodeFixed: (_, attr) => attr.highlighted,
+      isNodeFixed: (_, attr) => attr.highlighted || (auth.type !== "" && attr.label === auth.handle),
+      shouldSkipNode: (_, attr) => attr.hidden,
+      settings: { attraction: 0.00005 },
     });
   } else if (layoutName === "forceAtlas2") {
     const fa2settings = forceAtlas2.inferSettings(graph);
