@@ -4,6 +4,7 @@ import iwanthue from "iwanthue";
 
 import type { Node, Interaction, ProcessedData } from "../../stores/data";
 import { communities, setCommunities, setNodes } from "../../stores/graph";
+import { auth } from "../../stores/auth";
 
 export function updateGraph(data: ProcessedData): MultiDirectedGraph {
   const graph = new MultiDirectedGraph();
@@ -47,12 +48,17 @@ export function updateGraph(data: ProcessedData): MultiDirectedGraph {
 
   function updateNode(node: Node, score: number) {
     graph.updateNode(node.label, (attr) => {
+      const image =
+        auth.type === "bsky"
+          ? "https://i-love-cors-i-love-cors-i-love-cors-i-love-cors.meow-d.workers.dev/?url=" + node.image
+          : node.image;
+
       return {
         ...attr,
         label: node.label,
         mastoApiId: node.mastoApiId,
         display_name: node.display_name,
-        image: node.image,
+        image: image,
         score: (attr.score || 0) + score,
         size: 5,
         x: Math.random(),
