@@ -109,12 +109,13 @@ export function update() {
   setGraphHidden(!graph);
   if (!graph) return;
 
-  switchLayout(settings.layout, graph);
-
+  // TODO: use setGraph() instead of killing it
   if (renderer) renderer.kill();
   if (!container) return;
   renderer = updateRenderer(container, graph);
   renderer.getCamera().addListener("updated", (e) => setSettings("zoomAmount", e.ratio));
+
+  switchLayout(settings.layout, graph);
 }
 
 export function Graph() {
