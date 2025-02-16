@@ -94,6 +94,18 @@ h2 {
   gap: 1.3em;
 }
 
+a {
+  color: #b860aa;
+
+  &:hover {
+    filter: brightness(1.2);
+  }
+
+  &:active {
+    filter: brightness(0.8);
+  }
+}
+
 /* TODO: put in Section.module.css */
 /* sections */
 section > details {

@@ -4,6 +4,7 @@ import styles from "./Sidebar.module.css";
 import DataSection from "./DataSection";
 import SettingsSection from "./SettingsSection";
 import { createSignal, onMount, Show } from "solid-js";
+import AboutSection from "./AboutSection";
 
 export default function Sidebar() {
   let [collapsed, setCollapsed] = createSignal(false);
@@ -32,6 +33,7 @@ export default function Sidebar() {
         <div class={styles.content}>
           <DataSection />
           <SettingsSection />
+          <AboutSection />
         </div>
       </Show>
     </aside>

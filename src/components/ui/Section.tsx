@@ -9,7 +9,7 @@ interface SectionProps extends JSX.HTMLAttributes<HTMLElement> {
 export default function Section(props: SectionProps) {
   return (
     <section {...props}>
-      <details open={props.open ? true : false}>
+      <details open={props.open ?? false}>
         <summary>
           <h2>{props.title}</h2>
         </summary>
