@@ -17,21 +17,26 @@ export default async function fetchFeed(numberOfPosts: number): Promise<BskyFeed
   return { threads, likes, reposts };
 }
 
+/**
+ * Fetch posts from the home timeline, and return the root of each post.
+ */
 async function fetchTimelineRoot(numberOfPosts: number) {
   const rpc = await getRpc();
   const data = await rpc.get("app.bsky.feed.getTimeline", {
     params: { limit: numberOfPosts },
   });
 
-  const feed = filterBoosts(data.data.feed);
+  let feed = filterBoosts(data.data.feed);
   let postRoots = mapRoots(feed);
   postRoots = filterUnique(postRoots);
   return postRoots;
 
+  /** Filter out posts that are boosted into the timeline */
   function filterBoosts(feed: AppBskyFeedDefs.FeedViewPost[]) {
     return feed.filter((post) => !post.reason);
   }
 
+  /** Get the root of each post */
   function mapRoots(feed: AppBskyFeedDefs.FeedViewPost[]): AppBskyFeedDefs.PostView[] {
     return feed.flatMap((post) => {
       if (!post.reply?.root) return [];
@@ -40,7 +45,7 @@ async function fetchTimelineRoot(numberOfPosts: number) {
     });
   }
 
-  function filterUnique(items: any): any {
+  function filterUnique<T>(items: T[]): T[] {
     return [...new Set(items)];
   }
 }

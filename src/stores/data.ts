@@ -1,7 +1,5 @@
 import { createStore } from "solid-js/store";
 import { makePersisted } from "@solid-primitives/storage";
-import { AppBskyActorDefs } from "@atcute/client/lexicons";
-import { MastoAccount } from "../lib/masto/types";
 
 // Processed
 export interface Node {
