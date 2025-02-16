@@ -14,7 +14,7 @@ import { updateGraph } from "./updateGraph";
 import { updateRenderer } from "./updateRenderer";
 import { auth } from "../../stores/auth";
 
-const [graphHidden, setGraphHidden] = createSignal(false);
+const [graphHidden, setGraphHidden] = createSignal(!dataStore.processedData);
 let graph: MultiDirectedGraph;
 let renderer: Sigma;
 let container;
