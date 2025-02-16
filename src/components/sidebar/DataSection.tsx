@@ -75,9 +75,10 @@ export default function DataSection() {
       setStatus({
         message: message,
         error: true,
-        loading: false,
       });
     }
+
+    setStatus("loading", false);
   };
 
   const fetchFollows = async (client: Client) => {
