@@ -113,8 +113,8 @@ export default function DataSection() {
       const url = await client.createAuthUrl(handle);
 
       await new Promise((r) => setTimeout(r, 200));
+      setStatus("message", "Redirecting you...");
       window.location.assign(url);
-      setStatus({ message: "Failed to create auth url...?", error: true, loading: false });
     } catch (error: any) {
       console.error(error);
     }
