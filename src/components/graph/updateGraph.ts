@@ -57,6 +57,7 @@ export function updateGraph(data: ProcessedData): MultiDirectedGraph {
         ...attr,
         label: node.label,
         mastoApiId: node.mastoApiId,
+        bskyDid: node.bskyDid,
         display_name: node.display_name,
         image: image,
         score: (attr.score || 0) + score,

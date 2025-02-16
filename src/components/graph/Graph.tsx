@@ -52,13 +52,11 @@ function switchLayout(layoutName: "force" | "forceAtlas2", graph: MultiDirectedG
       shouldSkipNode: (_, attr) => attr.hidden,
       settings: { attraction: 0.00005 },
     });
-  } else if (layoutName === "forceAtlas2") {
+  } else {
     const fa2settings = forceAtlas2.inferSettings(graph);
     // adjustSizes takes node sizes in account, but it makes the graph move awkwardly
     // i mean i could probably only enable it after a few seconds or something
     layout = new FA2Layout(graph, { settings: { ...fa2settings } });
-  } else {
-    throw new Error("Invalid layout");
   }
 
   layout.start();
@@ -68,25 +66,19 @@ function switchLayout(layoutName: "force" | "forceAtlas2", graph: MultiDirectedG
 export function updateFilter(filter: Filter) {
   if (!graph || !renderer) return;
 
-  let user;
-  if (auth.type === "mastoapi") {
-    user = auth.handle;
-  } else if (auth.type === "bsky") {
-    // TODO: this can be a did or a handle
-    user = auth.handle;
-  } else {
-    console.error("No auth type. Defaulting to no filters.");
-  }
+  const userId = auth.type === "mastoapi" ? auth.id : auth.type === "bsky" ? auth.did : undefined;
+  const idAttribute = auth.type === "mastoapi" ? "label" : auth.type === "bsky" ? "bskyDid" : undefined;
 
-  if (!user || filter === Filter.None) {
-    for (const node of graph.nodes()) {
-      graph.setNodeAttribute(node, "hidden", undefined);
-    }
+  if (!userId || !idAttribute || filter === Filter.None) {
+    graph.forEachNode((node) => graph.setNodeAttribute(node, "hidden", undefined));
+    renderer.refresh();
     return;
   }
 
-  for (const node of graph.nodes()) {
-    if (node === user) continue;
+  const user = graph.findNode((_node, attributes) => attributes[idAttribute] === userId);
+
+  graph.forEachNode((node) => {
+    if (node === user) return;
 
     const followingUser = graph.findInEdge(user, node, (edge) => graph.getEdgeAttribute(edge, "follow") === true);
     const followedByUser = graph.findOutEdge(user, node, (edge) => graph.getEdgeAttribute(edge, "follow") === true);
@@ -96,12 +88,8 @@ export function updateFilter(filter: Filter) {
       (filter === Filter.Following && !followedByUser) ||
       (filter === Filter.Mutuals && (!followingUser || !followedByUser));
 
-    if (nodeHidden) {
-      graph.setNodeAttribute(node, "hidden", true);
-    } else {
-      graph.setNodeAttribute(node, "hidden", undefined);
-    }
-  }
+    graph.setNodeAttribute(node, "hidden", nodeHidden ? true : undefined);
+  });
 
   renderer.refresh();
 }

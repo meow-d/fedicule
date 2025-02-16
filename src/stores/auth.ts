@@ -10,6 +10,7 @@ type MastoAuth = {
   loggedIn: boolean;
   handle: string;
   instance: string;
+  id?: string;
   clientId?: string;
   clientSecret?: string;
   token?: string;

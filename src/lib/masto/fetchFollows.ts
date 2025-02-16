@@ -1,3 +1,4 @@
+import { setAuth } from "../../stores/auth";
 import { get, getNextPageUrl } from "./mastoapi";
 import { MastoFamiliarFollower, MastoFollowRaw } from "./types";
 import { MastoAccount } from "./types";
@@ -11,6 +12,9 @@ export default async function fetchFollows(): Promise<MastoFollowRaw> {
   const allAccounts = following.concat(followers);
   const uniqueAccounts = Array.from(new Map(allAccounts.map((item) => [item.id, item])).values());
   const familiarFollowers = await fetchFamiliarFollowers(uniqueAccounts);
+
+  // store user id, for graph user filters
+  setAuth({ id: user.id });
 
   return { user, following, followers, familiarFollowers };
 }
