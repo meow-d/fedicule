@@ -3,17 +3,18 @@ import { createStore } from "solid-js/store";
 
 import { update } from "../graph/Graph";
 
-import { MastoClient } from "../../lib/masto/client";
-
 import Section from "../ui/Section";
 import Checkbox from "../ui/Checkbox";
 import Message from "../ui/Message";
 import Button from "../ui/Button";
 
-import { auth, setAuth } from "../../stores/auth";
+import { auth } from "../../stores/auth";
 import { data, setData } from "../../stores/data";
+
 import { Client } from "../../lib/Client";
+import { MastoClient } from "../../lib/masto/client";
 import { BskyClient } from "../../lib/bsky/client";
+import { XRPCError } from "@atcute/client";
 
 export default function DataSection() {
   // status
@@ -57,17 +58,22 @@ export default function DataSection() {
     }
 
     client.onProgress((update: string) => setStatus("message", update));
+    setStatus({ error: false, loading: true });
     setData({ processedData: undefined });
-    setStatus("loading", true);
 
     try {
       if (follows) await fetchFollows(client as Client);
       if (home) await fetchPosts(client as Client, postsNo);
       update();
     } catch (error: any) {
+      let message = error.message;
+      if (error instanceof XRPCError && error.kind === "invalid_token") {
+        message = "Token expired. Please log in again.";
+      }
+
       console.error(error);
       setStatus({
-        message: error.message,
+        message: message,
         error: true,
         loading: false,
       });
@@ -115,7 +121,6 @@ export default function DataSection() {
   };
 
   onMount(async () => {
-    // TODO change to pathname
     if (window.location.pathname === "/callback/mastoapi") {
       client = getClient("mastoapi");
     } else if (window.location.pathname === "/callback/bsky") {
