@@ -1,88 +1,66 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
+import { faker } from "@faker-js/faker";
+
+import type { MastoFollowRaw, MastoAccount, MastoFamiliarFollower } from "./types";
+import type { Interaction } from "../../stores/data";
 import preprocessFollows from "./preprocessFollows";
-import { DataStore } from "../../stores/data";
-import type { MastoFollowRaw, MastoAccount } from "./types";
 
-// TODO: (or to not do) check everything
-// copilot generated...
 describe("preprocessFollows", () => {
-  const data: DataStore = {};
-
-  const mockAccount: MastoAccount = {
-    id: "1",
-    acct: "replyguy@mastodon.social",
-    display_name: "Test User",
-    avatar: "avatar.jpg",
-  };
-
-  const mockFollowRaw: MastoFollowRaw = {
-    following: [
-      {
-        id: "following1",
-        display_name: "Following 1",
-        avatar: "following1.jpg",
-        acct: "replyguy2@mastodon.social",
-      },
-      {
-        id: "familiar1",
-        display_name: "Familiar 1",
-        avatar: "familiar1.jpg",
-        acct: "replyguy2@mastodon.social",
-      },
-    ],
-    followers: [
-      {
-        id: "follower1",
-        display_name: "Follower 1",
-        avatar: "follower1.jpg",
-        acct: "replyguy2@mastodon.social",
-      },
-    ],
-    familiarFollowers: [
-      {
-        id: "following1",
-        accounts: [
-          {
-            id: "familiar1",
-            display_name: "Familiar 1",
-            avatar: "familiar1.jpg",
-            acct: "replyguy2@mastodon.social",
-          },
-        ],
-      },
-    ],
-    user: mockAccount,
-  };
-
-  it("should process following and followers correctly", async () => {
-    const result = await preprocessFollows(mockFollowRaw);
-
-    expect(result.interaction).toHaveLength(3);
-    expect(result.interaction[0]).toEqual({
-      sender: {
-        label: mockAccount.acct,
-        mastoApiId: mockAccount.id,
-        display_name: mockAccount.display_name,
-        image: mockAccount.avatar,
-      },
-      receiver: {
-        label: mockFollowRaw.following[0].acct,
-        mastoApiId: mockFollowRaw.following[0].id,
-        display_name: mockFollowRaw.following[0].display_name,
-        image: mockFollowRaw.following[0].avatar,
-      },
-      type: "follow",
-    });
+  const createMockAccount = (): MastoAccount => ({
+    id: faker.string.numeric(16),
+    acct: faker.internet.email(),
+    display_name: faker.person.fullName(),
+    avatar: faker.image.avatar(),
   });
 
-  it("should process familiar followers correctly", async () => {
+  const account = createMockAccount();
+  const accountA = createMockAccount();
+  const accountB = createMockAccount();
+  const accountC = createMockAccount();
+
+  const mockFamiliarFollowers: MastoFamiliarFollower[] = [
+    {
+      id: accountA.id,
+      accounts: [accountB],
+    },
+  ];
+
+  const mockFollowRaw: MastoFollowRaw = {
+    following: [accountA, accountB],
+    followers: [accountC],
+    familiarFollowers: mockFamiliarFollowers,
+    user: account,
+  };
+
+  const testInteraction = (
+    interaction: Interaction,
+    sender: MastoAccount,
+    receiver: MastoAccount,
+    type: Interaction["type"]
+  ) => {
+    expect(interaction.sender).toEqual({
+      label: sender.acct,
+      mastoApiId: sender.id,
+      display_name: sender.display_name,
+      image: sender.avatar,
+    });
+    expect(interaction.receiver).toEqual({
+      label: receiver.acct,
+      mastoApiId: receiver.id,
+      display_name: receiver.display_name,
+      image: receiver.avatar,
+    });
+    expect(interaction.type).toBe(type);
+  };
+
+  it("should process following, followers, and familiar followers correctly", async () => {
     const result = await preprocessFollows(mockFollowRaw);
 
-    const familiarInteraction = result.interaction.find(
-      (i) => i.sender.mastoApiId === "familiar1" && i.receiver.mastoApiId === "following1"
-    );
+    expect(result.interaction).toHaveLength(4);
 
-    expect(familiarInteraction).toBeTruthy();
-    expect(familiarInteraction?.type).toBe("follow");
+    testInteraction(result.interaction[0], account, accountA, "follow");
+    testInteraction(result.interaction[1], account, accountB, "follow");
+    testInteraction(result.interaction[2], accountC, account, "follow");
+    testInteraction(result.interaction[3], accountB, accountA, "follow");
   });
 });

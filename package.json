@@ -12,6 +12,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@faker-js/faker": "^9.5.0",
     "@types/d3": "^7.4.3",
     "@types/node": "^22.13.0",
     "jsdom": "^26.0.0",
