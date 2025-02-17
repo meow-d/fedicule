@@ -1,5 +1,5 @@
 import { JSX } from "solid-js/jsx-runtime";
-import styles from "../sidebar/Sidebar.module.css";
+import styles from "./Section.module.css";
 
 interface SectionProps extends JSX.HTMLAttributes<HTMLElement> {
   title: string;
@@ -8,7 +8,7 @@ interface SectionProps extends JSX.HTMLAttributes<HTMLElement> {
 
 export default function Section(props: SectionProps) {
   return (
-    <section {...props}>
+    <section {...props} class={styles.section}>
       <details open={props.open ?? false}>
         <summary>
           <h2>{props.title}</h2>

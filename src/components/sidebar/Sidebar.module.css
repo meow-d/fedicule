@@ -106,65 +106,6 @@ a {
   }
 }
 
-/* TODO: put in Section.module.css */
-/* sections */
-section > details {
-  padding: 10px;
-  border-radius: 15px;
-  box-shadow: 3px 0 1em #0000005a;
-
-  > * {
-    margin-bottom: 1rem;
-  }
-
-  > summary {
-    cursor: pointer;
-    list-style: none;
-    margin-bottom: 0.2em;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    :hover {
-      filter: brightness(1.2);
-    }
-
-    h2 {
-      font-size: 1.5em;
-      font-weight: 600;
-    }
-  }
-
-  > *:not(summary) {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2em;
-  }
-
-  h2,
-  label {
-    margin-left: 0.1rem;
-  }
-
-  label {
-    font-size: 1.1em;
-  }
-}
-
-summary::after {
-  content: "";
-  width: 0;
-  height: 0;
-  border-top: 10px solid #b860aa;
-  border-inline: 7px solid transparent;
-  transition: transform 0.3s;
-}
-
-details[open] > summary::after {
-  transform: rotate(-180deg);
-}
-
 /* inputs */
 input,
 select,
