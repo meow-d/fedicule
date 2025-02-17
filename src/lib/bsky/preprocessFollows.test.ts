@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
-import preprocessFollows from "./preprocessFollows";
+
 import type { BskyFollowRaw, BskyProfileWithFollowers } from "./types";
 import type { AppBskyActorDefs } from "@atcute/client/lexicons";
+import preprocessFollows from "./preprocessFollows";
 
 describe("preprocessFollows", () => {
   const createMockUser = (

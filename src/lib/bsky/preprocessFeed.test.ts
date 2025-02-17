@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
+
+import type { BskyFeedRaw } from "./types";
+import type { ProcessedData } from "../../stores/data";
 import preprocessFeed from "./preprocessFeed";
-import { BskyFeedRaw } from "./types";
-import { ProcessedData } from "../../stores/data";
 
 describe("preprocessFeed", () => {
   it("should process an empty feed", () => {
