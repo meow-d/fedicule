@@ -10,11 +10,16 @@ const HMR_ENABLED = false;
 const oauthPlugin: Plugin = {
   name: "inject-oauth-env",
   config(_conf, { command }) {
+    process.env.VITE_CLIENT_NAME = metadata.client_name;
+    process.env.VITE_CLIENT_URI = metadata.client_uri;
+    process.env.VITE_OAUTH_SCOPE = metadata.scope;
+
     if (command === 'build') {
       process.env.VITE_OAUTH_CLIENT_ID = metadata.client_id;
       process.env.VITE_OAUTH_REDIRECT_URI = metadata.redirect_uris[0];
       process.env.VITE_OAUTH_MASTO_REDIRECT_URI = metadataMasto.redirect_uris[0];
     } else {
+      // bsky
       const redirectUri = (() => {
         const url = new URL(metadata.redirect_uris[0]);
         return `http://${SERVER_HOST}:${SERVER_PORT}${url.pathname}`;
@@ -29,14 +34,13 @@ const oauthPlugin: Plugin = {
       process.env.VITE_OAUTH_CLIENT_ID = clientId;
       process.env.VITE_OAUTH_REDIRECT_URI = redirectUri;
 
-      // TODO: hardcoded for now
-      const redirectUriMasto = `http://${SERVER_HOST}:${SERVER_PORT}/callback/mastoapi`;
+      // masto
+      const redirectUriMasto = (() => {
+        const url = new URL(metadataMasto.redirect_uris[0]);
+        return `http://${SERVER_HOST}:${SERVER_PORT}${url.pathname}`;
+      })();
       process.env.VITE_OAUTH_MASTO_REDIRECT_URI = redirectUriMasto;
     }
-
-    process.env.VITE_CLIENT_NAME = metadata.client_name;
-    process.env.VITE_CLIENT_URI = metadata.client_uri;
-    process.env.VITE_OAUTH_SCOPE = metadata.scope;
   },
 };
 
