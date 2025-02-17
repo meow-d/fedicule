@@ -21,7 +21,7 @@ export default function Sidebar() {
   return (
     <aside class={collapsed() ? styles.collapsed : ""}>
       <button id={styles.collapseButton} onClick={toggleCollapsed}>
-        &gt;&gt;
+        {collapsed() ? ">>" : "|<<"}
       </button>
 
       <Show when={!collapsed()}>

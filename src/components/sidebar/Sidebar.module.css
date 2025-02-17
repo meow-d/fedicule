@@ -18,12 +18,12 @@ aside {
   box-shadow: 1px 0 10px #0000005f;
   text-shadow: 1px 2px 10px #0000004b;
 
-  transition: width 0.3s cubic-bezier(0, 1.13, 0, 0.92);
-  will-change: width; 
+  transition: transform 0.3s cubic-bezier(0, 1.13, 0, 0.92);
   margin-bottom: auto;
+  overflow: clip;
 
   &.collapsed {
-    width: 1.3em;
+    transform: translateX(calc(-100% + 1.3em));
     height: 1.2em;
     position: fixed;
     left: 0;
@@ -36,17 +36,21 @@ aside {
 #collapseButton {
   width: fit-content;
   background: none;
-  color: white;
+  color: #b860aa;
   transition: text-shadow 0.6s;
 
   &:hover {
-    text-shadow: 0 0 1em #ff0000, -0.4em -0.4em 1em #ff0000, -0.4em -0.4em 1em #ff0000;
+    text-shadow: 0 0 1em #ff0000, -1px -1px 1em #ff0000, -1px -1px 1em #ff0000;
   }
 
   &:active {
   transition: none;
-  text-shadow: none;
+  text-shadow: 0 0 1em #9e0000, -1px -1px 1em #9e0000, -1px -1px 1em #9e0000;
   }
+}
+
+aside.collapsed #collapseButton {
+  margin-left: auto;
 }
 
 /* header */
