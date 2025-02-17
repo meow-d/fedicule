@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
-import preprocessFeed from "./preprocessFeed";
+
 import type { MastoFeedRaw } from "./types";
+import { createMockAccount, createMockLikeOrBoost, createMockPost, testInteraction, testMention } from "./testUtils";
+import preprocessFeed from "./preprocessFeed";
 
 describe("preprocessFeed", () => {
   it("should process an empty feed", () => {
@@ -15,65 +17,35 @@ describe("preprocessFeed", () => {
   });
 
   it("should process mentions, likes and boosts", () => {
+    const accountA = createMockAccount();
+    const accountB = createMockAccount();
+    const accountC = createMockAccount();
+
     const testFeed: MastoFeedRaw = {
       posts: [
-        {
-          account: {
-            acct: "sender1",
-            id: "1",
-            display_name: "Sender One",
-            avatar: "avatar1.jpg",
-          },
-          mentions: [
-            {
-              acct: "receiver1",
-              id: "2",
-            },
-          ],
-          id: "1",
-          content:
-            'Hello #mastodon hashtag mastodon im guy "reply guy" reply, a reply guy, here to reply on your #guys. my pronoun? he/him. i love joe biden',
-          created_at: "this is supposed to be a date but it doesn't matter",
-          visibility: "public",
-          favourites_count: 1,
-          reblogs_count: 1,
-        },
+        createMockPost(accountA, [accountB]),
+        createMockPost(accountB, [accountA]),
+        createMockPost(accountC, [accountB, accountA]),
+        createMockPost(accountC),
       ],
       likes: [
-        {
-          acct: "liker1",
-          id: "3",
-          display_name: "Liker One",
-          avatar: "avatar2.jpg",
-          receiver: {
-            label: "receiver2",
-            mastoApiId: "4",
-            display_name: "Receiver Two",
-            image: "avatar3.jpg",
-          },
-        },
+        createMockLikeOrBoost(accountA, accountB),
+        createMockLikeOrBoost(accountB, accountA),
+        createMockLikeOrBoost(accountC, accountA),
       ],
-      boosts: [
-        {
-          acct: "booster1",
-          id: "5",
-          display_name: "Booster One",
-          avatar: "avatar4.jpg",
-          receiver: {
-            label: "receiver3",
-            mastoApiId: "6",
-            display_name: "Receiver Three",
-            image: "avatar5.jpg",
-          },
-        },
-      ],
+      boosts: [createMockLikeOrBoost(accountC, accountB)],
     };
 
     const result = preprocessFeed(testFeed);
 
-    expect(result.interaction).toHaveLength(3);
-    expect(result.interaction[0].type).toBe("mention");
-    expect(result.interaction[1].type).toBe("like");
-    expect(result.interaction[2].type).toBe("boost");
+    expect(result.interaction).toHaveLength(8);
+    testMention(result.interaction[0], accountA, accountB);
+    testMention(result.interaction[1], accountB, accountA);
+    testMention(result.interaction[2], accountC, accountB);
+    testMention(result.interaction[3], accountC, accountA);
+    testInteraction(result.interaction[4], accountA, accountB, "like");
+    testInteraction(result.interaction[5], accountB, accountA, "like");
+    testInteraction(result.interaction[6], accountC, accountA, "like");
+    testInteraction(result.interaction[7], accountC, accountB, "boost");
   });
 });
