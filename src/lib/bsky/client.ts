@@ -26,7 +26,6 @@ export class BskyClient extends Client {
   }
 
   // data
-  // TODO: test
   async fetchFeed(numberOfPosts: number): Promise<ProcessedData> {
     this.emitProgress("Fetching feed...");
     const raw = await fetchFeed(numberOfPosts);
@@ -41,8 +40,6 @@ export class BskyClient extends Client {
   async fetchFollows(): Promise<ProcessedData> {
     this.emitProgress("Fetching follows...");
     const raw = await fetchFollows();
-
-    // TODO: we're kinda fetching data we already have
     const user = await fetchCurrentUser();
 
     this.emitProgress("Processing follows...");

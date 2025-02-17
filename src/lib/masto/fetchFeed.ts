@@ -105,12 +105,7 @@ async function fetchInteractions(
 
   function addReceiver(data: MastoLikesOrBoost[], post: MastoPost) {
     data.forEach((interaction) => {
-      interaction.receiver = {
-        label: post.account.acct,
-        mastoApiId: post.account.id,
-        display_name: post.account.display_name,
-        image: post.account.avatar,
-      };
+      interaction.receiver = post.account;
     });
   }
 }

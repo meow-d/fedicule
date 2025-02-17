@@ -27,12 +27,7 @@ export const createMockPost = (account: MastoAccount, mentions?: MastoAccount[])
 
 export const createMockLikeOrBoost = (sender: MastoAccount, receiver: MastoAccount): MastoLikesOrBoost => ({
   ...sender,
-  receiver: {
-    label: receiver.acct,
-    mastoApiId: receiver.id,
-    display_name: receiver.display_name,
-    image: receiver.avatar,
-  },
+  receiver: receiver,
 });
 
 /** Test interactions that contain the full data */

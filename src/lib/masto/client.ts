@@ -25,8 +25,10 @@ export class MastoClient extends Client {
   async fetchFeed(numberOfPosts: number): Promise<ProcessedData> {
     this.emitProgress("Fetching feed...");
     const raw = await fetchFeed(numberOfPosts);
+
     this.emitProgress("Processing feed...");
     const processed = preprocessFeed(raw);
+
     this.emitProgress("Success!");
     return processed;
   }
@@ -34,8 +36,10 @@ export class MastoClient extends Client {
   async fetchFollows(): Promise<ProcessedData> {
     this.emitProgress("Fetching follows...");
     const raw = await fetchFollows();
+
     this.emitProgress("Processing follows...");
     const processed = preprocessFollows(raw);
+
     this.emitProgress("Success!");
     return processed;
   }

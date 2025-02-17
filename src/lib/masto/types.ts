@@ -31,8 +31,7 @@ export interface MastoPost {
 }
 
 export interface MastoLikesOrBoost extends MastoAccount {
-  // TODO: hold on why is this node not mastoaccount..
-  receiver?: Node;
+  receiver: MastoAccount;
 }
 
 export interface MastoFeedRaw {

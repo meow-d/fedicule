@@ -1,5 +1,5 @@
 import { Interaction, Node, ProcessedData } from "../../stores/data";
-import { MastoFeedRaw, mastoMentions as MastoMentions, MastoPost } from "./types";
+import { MastoFeedRaw, MastoLikesOrBoost, mastoMentions as MastoMentions, MastoPost } from "./types";
 import { fetchUser } from "./user";
 
 export default function preprocessFeed(data: MastoFeedRaw): ProcessedData {
@@ -49,7 +49,11 @@ function preprocessMentions(posts: MastoPost[], interactions: Interaction[]) {
   }
 }
 
-function preprocessLikesOrBoost(raw: any[], interactionType: "boost" | "like", interactions: Interaction[]) {
+function preprocessLikesOrBoost(
+  raw: MastoLikesOrBoost[],
+  interactionType: "boost" | "like",
+  interactions: Interaction[]
+) {
   raw.forEach((interaction) => {
     interactions.push({
       sender: {
@@ -58,7 +62,12 @@ function preprocessLikesOrBoost(raw: any[], interactionType: "boost" | "like", i
         display_name: interaction.display_name,
         image: interaction.avatar,
       },
-      receiver: interaction.receiver,
+      receiver: {
+        label: interaction.receiver.acct,
+        mastoApiId: interaction.receiver.id,
+        display_name: interaction.receiver.display_name,
+        image: interaction.receiver.avatar,
+      },
       type: interactionType,
     });
   });

@@ -30,7 +30,6 @@
     background: var(--button-background);
     color: #42002f;
 
-    /* TODO: tweak */
     transition: transform 0.4s cubic-bezier(0.215, 0.61, 0.355, 1),
           box-shadow 0.4s linear,
           filter 0.4s linear;
