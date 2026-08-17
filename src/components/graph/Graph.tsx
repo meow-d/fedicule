@@ -8,7 +8,8 @@ import FA2Layout from "graphology-layout-forceatlas2/worker";
 import Sigma from "sigma";
 import { fitViewportToNodes } from "@sigma/utils";
 
-import { data as dataStore } from "../../stores/data";
+import { data as dataStore, setData } from "../../stores/data";
+import { sampleData } from "../../lib/sampleData";
 import { settings, setSettings, Filter } from "../../stores/settings";
 import { updateGraph } from "./updateGraph";
 import { updateRenderer } from "./updateRenderer";

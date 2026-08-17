@@ -15,6 +15,7 @@ import { Client } from "../../lib/Client";
 import { MastoClient } from "../../lib/masto/client";
 import { BskyClient } from "../../lib/bsky/client";
 import { XRPCError } from "@atcute/client";
+import { sampleData } from "../../lib/sampleData";
 
 export default function DataSection() {
   // status
@@ -95,6 +96,11 @@ export default function DataSection() {
     }
     setData({ processedData });
   };
+
+  const loadSampleData = async () => {
+    const processedData = sampleData;
+    setData({ processedData });
+  }
 
   // login
   const login = async () => {
@@ -249,11 +255,18 @@ export default function DataSection() {
         <Show
           when={auth.type && auth.loggedIn}
           fallback={
-            <Button disabled={status.loading} onclick={login}>
-              login
-            </Button>
+            <>
+              <Button disabled={status.loading} onclick={login}>
+                login
+              </Button>
+
+              <Button disabled={status.loading} onClick={loadSampleData}>
+                sample data
+              </Button>
+            </>
           }
         >
+
           <Button disabled={status.loading} onclick={logout}>
             logout
           </Button>
@@ -261,6 +274,11 @@ export default function DataSection() {
           <Button disabled={fetchDisabled()} onClick={startFetch}>
             {data.processedData ? "refetch" : "fetch"}
           </Button>
+
+          <Button disabled={status.loading} onClick={loadSampleData}>
+            sample data
+          </Button>
+
         </Show>
 
         <Show when={status.message}>
