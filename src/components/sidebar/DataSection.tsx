@@ -199,7 +199,7 @@ export default function DataSection() {
             Mastodon
           </option>
           <option value="bsky" selected={inputs.api === "bsky"}>
-            Bluesky (wip)
+            Bluesky
           </option>
         </select>
       </div>
