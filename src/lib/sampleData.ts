@@ -3,6 +3,7 @@ import type { Node, Interaction, ProcessedData } from "../stores/data";
 const node = (label: string, display_name: string): Node => ({
   label,
   display_name,
+  // TODO: dicebar has an api limit for png, but svg displays weridly in graphology
   image: `https://api.dicebear.com/10.x/glass/png?seed=${encodeURIComponent(label)}`,
 });
 
