@@ -3,7 +3,7 @@ import type { Node, Interaction, ProcessedData } from "../stores/data";
 const node = (label: string, display_name: string): Node => ({
   label,
   display_name,
-  image: `https://api.dicebear.com/10.x/glass/svg?seed=${encodeURIComponent(label)}`,
+  image: `https://api.dicebear.com/10.x/glass/png?seed=${encodeURIComponent(label)}`,
 });
 
 const follow = (sender: Node, receiver: Node): Interaction => ({ sender, receiver, type: "follow" });
