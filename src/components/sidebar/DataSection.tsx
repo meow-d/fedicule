@@ -98,8 +98,12 @@ export default function DataSection() {
   };
 
   const loadSampleData = async () => {
+    setStatus({ error: false, loading: true });
     const processedData = sampleData;
+    console.log(processedData)
     setData({ processedData });
+    update();
+    setStatus("loading", false);
   }
 
   // login
@@ -116,7 +120,7 @@ export default function DataSection() {
       }
 
       if (!client) throw new Error("Client not found...?");
-      setStatus({ message: "Creatng auth url...", error: false, loading: true });
+      setStatus({ message: "Creating auth url...", error: false, loading: true });
       const url = await client.createAuthUrl(handle);
 
       await new Promise((r) => setTimeout(r, 200));
@@ -205,7 +209,7 @@ export default function DataSection() {
             Mastodon
           </option>
           <option value="bsky" selected={inputs.api === "bsky"}>
-            Bluesky
+            Atproto (Bluesky)
           </option>
         </select>
       </div>
